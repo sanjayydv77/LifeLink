@@ -349,7 +349,7 @@ export default function AmbulancePortal() {
                 <div className="bg-[#071E1A]/95 backdrop-blur-sm border border-teal-600/60 rounded-2xl px-4 py-2.5 shadow-2xl flex items-center gap-3">
                   <Navigation className="w-4 h-4 text-teal-400 shrink-0"/>
                   <div><div className="text-[9px] text-teal-400/60 uppercase tracking-widest font-bold">Navigating to</div><div className="text-white font-bold text-sm">{navigatingTo.name}</div></div>
-                  <button onClick={()=>window.open(`https://www.google.com/maps/dir/?api=1&origin=${myLoc.lat},${myLoc.lng}&destination=${navigatingTo.lat},${navigatingTo.lng}&travelmode=driving`,'_blank')} className="px-3 py-1.5 bg-teal-500 hover:bg-teal-400 text-white text-[10px] font-bold uppercase tracking-wider rounded-lg ml-1 flex items-center gap-1"><Navigation className="w-3 h-3"/>Open Maps</button>
+                  <button onClick={()=>window.open(`https://www.google.com/maps/dir/?api=1&origin=${driverLoc.lat},${driverLoc.lng}&destination=${navigatingTo.lat},${navigatingTo.lng}&travelmode=driving`,'_blank')} className="px-3 py-1.5 bg-teal-500 hover:bg-teal-400 text-white text-[10px] font-bold uppercase tracking-wider rounded-lg ml-1 flex items-center gap-1"><Navigation className="w-3 h-3"/>Open Maps</button>
                   <button onClick={()=>setNavigatingTo(null)} className="text-teal-500/60 hover:text-white text-lg leading-none ml-1">×</button>
                 </div>
               </div>
@@ -387,7 +387,7 @@ export default function AmbulancePortal() {
                   <div className="flex items-center gap-1 text-[10px] text-teal-500/60 mb-2"><MapPin className="w-2.5 h-2.5 shrink-0"/><span className="truncate">{h.address}</span></div>
                   {/* Specializations */}
                   <div className="flex flex-wrap gap-1 mb-3">
-                    {h.specializations.map(s=><span key={s} className="text-[9px] font-bold bg-teal-900/30 border border-teal-800/30 text-teal-400 px-1.5 py-0.5 rounded-full">{s}</span>)}
+                    {h.specializations.map((s: string)=><span key={s} className="text-[9px] font-bold bg-teal-900/30 border border-teal-800/30 text-teal-400 px-1.5 py-0.5 rounded-full">{s}</span>)}
                   </div>
                   {/* Resources */}
                   <div className="grid grid-cols-4 gap-1.5 mb-3">
@@ -407,7 +407,10 @@ export default function AmbulancePortal() {
                   {/* Actions */}
                   <div className="flex gap-2">
                     <a href={`tel:${h.phone}`} className="flex-1 py-2 bg-[#071E1A] hover:bg-teal-900/40 border border-teal-700/40 hover:border-teal-500 text-teal-300 text-[10px] font-bold uppercase tracking-wider rounded flex items-center justify-center gap-1 transition-all"><Phone className="w-3 h-3"/>Call</a>
-                    <button onClick={()=>setNavigatingTo({name:h.name,lat:h.lat,lng:h.lng})} className={`flex-1 py-2 border text-[10px] font-bold uppercase tracking-wider rounded flex items-center justify-center gap-1 transition-all ${navigatingTo?.name===h.name?'bg-teal-900/60 border-teal-500 text-teal-300':'bg-[#071E1A] hover:bg-teal-900/40 border-teal-700/40 hover:border-teal-500 text-teal-300'}`}><Navigation className="w-3 h-3"/>{navigatingTo?.name===h.name?'Active ✓':'Nav'}</button>
+                    <button onClick={()=>{
+                      setNavigatingTo({name:h.name,lat:h.lat,lng:h.lng});
+                      window.open(`https://www.google.com/maps/dir/?api=1&origin=${driverLoc.lat},${driverLoc.lng}&destination=${h.lat},${h.lng}&travelmode=driving`,'_blank');
+                    }} className={`flex-1 py-2 border text-[10px] font-bold uppercase tracking-wider rounded flex items-center justify-center gap-1 transition-all ${navigatingTo?.name===h.name?'bg-teal-900/60 border-teal-500 text-teal-300':'bg-[#071E1A] hover:bg-teal-900/40 border-teal-700/40 hover:border-teal-500 text-teal-300'}`}><Navigation className="w-3 h-3"/>{navigatingTo?.name===h.name?'Active ✓':'Nav'}</button>
                     <button disabled={!!informStatus} onClick={async()=>{
                       try {
                         await fetch(`${API_URL}/api/ambulance/notify-hospital`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ambulance_driver_id:DEMO_DRIVER_ID,hospital_id:h.id,patient_type:activeDispatch?.condition||'Emergency',patient_condition:activeDispatch?.condition||'Critical',number_of_patients:1,eta_minutes:parseInt(h.eta)||10,driver_contact:driver.phone})});
