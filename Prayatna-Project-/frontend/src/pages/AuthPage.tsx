@@ -4,7 +4,6 @@ import {
   ChevronLeft, Shield, Eye, EyeOff, CheckCircle2, Loader2,
   Ambulance, Stethoscope, Users, ArrowRight, Lock, RefreshCw
 } from 'lucide-react';
-import ClayScene from '../components/ClayCharacters';
 
 // Inject login page keyframes once
 const LOGIN_STYLE = `
@@ -469,9 +468,14 @@ export default function AuthPage({ onAuth }: { onAuth: (user: any) => void }) {
         ))}
       </div>
 
-
-      {/* Clay characters — parallax with mouse */}
-      <ClayScene mouseX={mouse.x} mouseY={mouse.y} />
+      {/* Floating bg icons */}
+      <div className="absolute inset-0 pointer-events-none">
+        {ICONS_BG.map(({Icon,x,y,delay,size},i)=>(
+          <div key={i} style={{position:'absolute',left:`${x}%`,top:`${y}%`,opacity:0.055,color:'#14b8a6',animation:`llFloat2 8s ease-in-out infinite ${delay}`,transform:`translate(-50%,-50%)`}}>
+            <Icon style={{width:size,height:size}}/>
+          </div>
+        ))}
+      </div>
 
       {/* Content */}
       <div className="w-full max-w-md relative z-10" style={{animation:'llFadeUp 0.6s ease both'}}>

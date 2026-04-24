@@ -4,6 +4,7 @@ import PublicPortal from './pages/PublicPortal';
 import AmbulancePortal from './pages/AmbulancePortal';
 import HospitalPortal from './pages/HospitalPortal';
 import AuthPage from './pages/AuthPage';
+import SuperAdmin from './pages/SuperAdmin';
 import LifeLinkChatbot from './components/LifeLinkChatbot';
 
 // Reads persisted auth from sessionStorage (per-tab — each tab is independent)
@@ -50,6 +51,7 @@ function AppInner() {
     return (
       <Routes>
         <Route path="/auth" element={<AuthPage onAuth={handleAuth} />} />
+        <Route path="/admin" element={<SuperAdmin />} />
         <Route path="*" element={<Navigate to="/auth" replace />} />
       </Routes>
     );
@@ -59,6 +61,8 @@ function AppInner() {
 
   return (
     <Routes>
+      {/* Admin route — always accessible regardless of auth */}
+      <Route path="/admin" element={<SuperAdmin />} />
       {/* Patient → Public Portal */}
       <Route
         path="/"
