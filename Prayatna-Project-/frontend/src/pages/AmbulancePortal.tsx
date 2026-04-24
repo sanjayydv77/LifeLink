@@ -233,7 +233,7 @@ export default function AmbulancePortal() {
   };
 
   const missionBtnLabel: Record<string,string> = { DISPATCHED:'Accept SOS', EN_ROUTE:'Arrived (Manual)', ON_SCENE:'Patient Picked Up', TRANSPORTING:'Handover Complete' };
-  const missionBtnColor: Record<string,string> = { DISPATCHED:'bg-rose-600 hover:bg-rose-500 shadow-rose-900', EN_ROUTE:'bg-teal-700 hover:bg-teal-600', ON_SCENE:'bg-blue-600 hover:bg-blue-500', TRANSPORTING:'bg-emerald-600 hover:bg-emerald-500' };
+  const missionBtnColor: Record<string,string> = { DISPATCHED:'bg-rose-600 hover:bg-rose-500 shadow-rose-900', EN_ROUTE:'bg-teal-700 hover:bg-teal-500', ON_SCENE:'bg-blue-600 hover:bg-blue-500', TRANSPORTING:'bg-emerald-600 hover:bg-emerald-500' };
 
   return (
     <div className="h-screen flex flex-col bg-[#071E1A] font-sans overflow-hidden">
@@ -254,7 +254,7 @@ export default function AmbulancePortal() {
               <li>Refresh this page</li>
             </ol>
           </div>
-          <button onClick={() => window.location.reload()} className="px-8 py-3 bg-teal-600 hover:bg-teal-500 text-white font-bold rounded-xl transition-all">
+          <button onClick={() => window.location.reload()} className="px-8 py-3 bg-teal-500 hover:bg-teal-400 text-white font-bold rounded-xl transition-all">
             Retry after allowing location
           </button>
         </div>
@@ -295,7 +295,7 @@ export default function AmbulancePortal() {
               <CheckCircle className="w-4 h-4"/>{missionBtnLabel[missionState]}
             </button>
           )}
-          {missionState==='ACCEPTED' && <button onClick={handleAction} className="px-5 py-2 bg-teal-800/50 text-teal-200 text-xs font-bold uppercase tracking-wider rounded-lg border border-teal-700 animate-pulse">Processing…</button>}
+          {missionState==='ACCEPTED' && <button onClick={handleAction} className="px-5 py-2 bg-teal-800/50 text-teal-200 text-xs font-bold uppercase tracking-wider rounded-lg border border-teal-600 animate-pulse">Processing…</button>}
         </div>
       )}
       {missionState==='COMPLETED' && (
@@ -448,7 +448,7 @@ export default function AmbulancePortal() {
                   <input value={(draftDriver as any)[f.key]} onChange={e=>setDraftDriver(prev=>({...prev,[f.key]:e.target.value}))} placeholder={f.placeholder} className="w-full bg-[#071E1A] border border-teal-800/60 rounded-lg px-3 py-2.5 text-white text-sm outline-none focus:border-teal-500 placeholder:text-teal-800"/>
                 </div>
               ))}
-              <button onClick={()=>{setDriver(draftDriver);setProfileOpen(false);}} className="w-full py-3 mt-2 bg-teal-600 hover:bg-teal-500 text-white font-bold rounded-xl flex items-center justify-center gap-2 transition-all">
+              <button onClick={()=>{setDriver(draftDriver);setProfileOpen(false);}} className="w-full py-3 mt-2 bg-teal-500 hover:bg-teal-400 text-white font-bold rounded-xl flex items-center justify-center gap-2 transition-all">
                 <Save className="w-4 h-4"/>Save Profile
               </button>
             </div>

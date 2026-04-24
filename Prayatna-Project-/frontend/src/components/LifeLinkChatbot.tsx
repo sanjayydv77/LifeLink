@@ -7,8 +7,8 @@ const STYLE = `
 @keyframes llRing1  { 0%{transform:scale(1);opacity:.6} 100%{transform:scale(2.2);opacity:0} }
 @keyframes llRing2  { 0%{transform:scale(1);opacity:.45} 100%{transform:scale(2.8);opacity:0} }
 @keyframes llRing3  { 0%{transform:scale(1);opacity:.3} 100%{transform:scale(3.4);opacity:0} }
-@keyframes llGlow   { 0%,100%{box-shadow:0 0 18px 4px rgba(20,184,166,.55),0 8px 32px rgba(0,0,0,.5)}
-                      50%{box-shadow:0 0 32px 10px rgba(20,184,166,.85),0 8px 40px rgba(0,0,0,.5)} }
+@keyframes llGlow   { 0%,100%{box-shadow:0 0 18px 4px rgba(45,212,191,.55),0 8px 32px rgba(0,0,0,.5)}
+                      50%{box-shadow:0 0 32px 10px rgba(45,212,191,.85),0 8px 40px rgba(0,0,0,.5)} }
 @keyframes llBubble { 0%{opacity:0;transform:scale(.8) translateY(6px)} 15%{opacity:1;transform:scale(1) translateY(0)}
                       80%{opacity:1;transform:scale(1) translateY(0)} 100%{opacity:0;transform:scale(.9) translateY(-4px)} }
 @keyframes llBounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-3px)} }
@@ -141,21 +141,21 @@ export default function LifeLinkChatbot() {
         {/* Radar rings — only when closed */}
         {!open && !dragging && (
           <>
-            <div style={{ position:'absolute',inset:0,borderRadius:'50%',background:'rgba(20,184,166,.35)',animation:'llRing1 2.4s ease-out infinite' }} />
-            <div style={{ position:'absolute',inset:0,borderRadius:'50%',background:'rgba(20,184,166,.25)',animation:'llRing2 2.4s ease-out infinite .5s' }} />
-            <div style={{ position:'absolute',inset:0,borderRadius:'50%',background:'rgba(20,184,166,.15)',animation:'llRing3 2.4s ease-out infinite 1s' }} />
+            <div style={{ position:'absolute',inset:0,borderRadius:'50%',background:'rgba(45,212,191,.35)',animation:'llRing1 2.4s ease-out infinite' }} />
+            <div style={{ position:'absolute',inset:0,borderRadius:'50%',background:'rgba(45,212,191,.25)',animation:'llRing2 2.4s ease-out infinite .5s' }} />
+            <div style={{ position:'absolute',inset:0,borderRadius:'50%',background:'rgba(45,212,191,.15)',animation:'llRing3 2.4s ease-out infinite 1s' }} />
           </>
         )}
 
         {/* Tooltip bubble */}
         {bubble && !open && (
           <div style={{ position:'absolute',bottom:'calc(100% + 10px)',left:'50%',transform:'translateX(-50%)',
-            background:'linear-gradient(135deg,#0a2822,#0c3028)',border:'1px solid rgba(20,184,166,.5)',
+            background:'linear-gradient(135deg,#0a2822,#0c3028)',border:'1px solid rgba(45,212,191,.5)',
             borderRadius:14,padding:'7px 14px',whiteSpace:'nowrap',boxShadow:'0 8px 24px rgba(0,0,0,.5)',
             animation:'llBubble 3.2s ease forwards',pointerEvents:'none',color:'#5eead4',fontWeight:700,fontSize:12 }}>
             {bubble}
             <div style={{ position:'absolute',bottom:-6,left:'50%',
-              width:10,height:10,background:'#0c3028',border:'1px solid rgba(20,184,166,.4)',
+              width:10,height:10,background:'#0c3028',border:'1px solid rgba(45,212,191,.4)',
               borderTop:'none',borderLeft:'none',transform:'translateX(-50%) rotate(45deg)' }} />
           </div>
         )}
@@ -167,7 +167,7 @@ export default function LifeLinkChatbot() {
           title="LifeLink Assistant"
           style={{
             width: 60, height: 60, borderRadius: '50%', border: 'none', cursor: dragging ? 'grabbing' : 'grab',
-            background: open ? 'linear-gradient(135deg,#dc2626,#991b1b)' : 'linear-gradient(135deg,#14b8a6,#0f766e)',
+            background: open ? 'linear-gradient(135deg,#dc2626,#991b1b)' : 'linear-gradient(135deg,#14b8a6,#0d9488)',
             display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative',
             animation: open || dragging ? 'none' : 'llFloat 3s ease-in-out infinite, llGlow 2.5s ease-in-out infinite',
             transition: 'background .3s',
@@ -183,7 +183,7 @@ export default function LifeLinkChatbot() {
             )
           }
           {/* Live pulse dot */}
-          {!open && <span style={{ position:'absolute',top:4,right:4,width:10,height:10,background:'#4ade80',borderRadius:'50%',border:'2px solid #0f766e',animation:'llBounce 1.2s ease-in-out infinite' }} />}
+          {!open && <span style={{ position:'absolute',top:4,right:4,width:10,height:10,background:'#4ade80',borderRadius:'50%',border:'2px solid #0d9488',animation:'llBounce 1.2s ease-in-out infinite' }} />}
         </button>
       </div>
 
@@ -192,12 +192,12 @@ export default function LifeLinkChatbot() {
         <div style={{
           position: 'fixed', left: Math.max(8, chatLeft), top: chatTop, zIndex: 9998,
           width: 360, maxHeight: 540, display: 'flex', flexDirection: 'column', borderRadius: 20,
-          overflow: 'hidden', boxShadow: '0 24px 64px rgba(0,0,0,.65), 0 0 0 1px rgba(20,184,166,.25)',
+          overflow: 'hidden', boxShadow: '0 24px 64px rgba(0,0,0,.65), 0 0 0 1px rgba(45,212,191,.25)',
           background: 'linear-gradient(180deg,#0a2822 0%,#071e1a 100%)',
         }}>
           {/* Header */}
-          <div style={{ display:'flex',alignItems:'center',gap:12,padding:'12px 16px',background:'rgba(10,40,34,.9)',borderBottom:'1px solid rgba(20,184,166,.2)',flexShrink:0 }}>
-            <div style={{ width:40,height:40,borderRadius:'50%',background:'linear-gradient(135deg,#14b8a6,#0f766e)',display:'flex',alignItems:'center',justifyContent:'center',boxShadow:'0 4px 12px rgba(20,184,166,.4)',flexShrink:0 }}>
+          <div style={{ display:'flex',alignItems:'center',gap:12,padding:'12px 16px',background:'rgba(10,40,34,.9)',borderBottom:'1px solid rgba(45,212,191,.2)',flexShrink:0 }}>
+            <div style={{ width:40,height:40,borderRadius:'50%',background:'linear-gradient(135deg,#14b8a6,#0d9488)',display:'flex',alignItems:'center',justifyContent:'center',boxShadow:'0 4px 12px rgba(45,212,191,.4)',flexShrink:0 }}>
               <Stethoscope style={{ width:18,height:18,color:'white' }} />
             </div>
             <div style={{ flex:1,minWidth:0 }}>
@@ -217,15 +217,15 @@ export default function LifeLinkChatbot() {
             {messages.map((m, i) => (
               <div key={i} style={{ display:'flex',gap:8,justifyContent:m.role==='user'?'flex-end':'flex-start' }}>
                 {m.role==='bot' && (
-                  <div style={{ width:28,height:28,borderRadius:'50%',background:'linear-gradient(135deg,#14b8a6,#0f766e)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,marginTop:2 }}>
+                  <div style={{ width:28,height:28,borderRadius:'50%',background:'linear-gradient(135deg,#14b8a6,#0d9488)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,marginTop:2 }}>
                     <Stethoscope style={{ width:13,height:13,color:'white' }} />
                   </div>
                 )}
                 <div style={{
                   maxWidth:'82%',padding:'10px 12px',borderRadius:m.role==='user'?'18px 18px 4px 18px':'18px 18px 18px 4px',
                   fontSize:11,lineHeight:1.65,
-                  background:m.role==='user'?'linear-gradient(135deg,#0d9488,#0f766e)':'rgba(12,46,40,1)',
-                  border:m.role==='user'?'none':'1px solid rgba(20,184,166,.25)',
+                  background:m.role==='user'?'linear-gradient(135deg,#14b8a6,#0d9488)':'rgba(12,46,40,1)',
+                  border:m.role==='user'?'none':'1px solid rgba(45,212,191,.25)',
                   color:m.role==='user'?'white':'rgba(204,251,241,1)',
                 }}>
                   <MsgText text={m.text} />
@@ -237,10 +237,10 @@ export default function LifeLinkChatbot() {
             ))}
             {typing && (
               <div style={{ display:'flex',gap:8,justifyContent:'flex-start' }}>
-                <div style={{ width:28,height:28,borderRadius:'50%',background:'linear-gradient(135deg,#14b8a6,#0f766e)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0 }}>
+                <div style={{ width:28,height:28,borderRadius:'50%',background:'linear-gradient(135deg,#14b8a6,#0d9488)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0 }}>
                   <Stethoscope style={{ width:13,height:13,color:'white' }} />
                 </div>
-                <div style={{ background:'rgba(12,46,40,1)',border:'1px solid rgba(20,184,166,.25)',padding:'12px 16px',borderRadius:'18px 18px 18px 4px',display:'flex',alignItems:'center',gap:5 }}>
+                <div style={{ background:'rgba(12,46,40,1)',border:'1px solid rgba(45,212,191,.25)',padding:'12px 16px',borderRadius:'18px 18px 18px 4px',display:'flex',alignItems:'center',gap:5 }}>
                   {[0,150,300].map(d => <span key={d} style={{ width:7,height:7,background:'#14b8a6',borderRadius:'50%',display:'block',animation:`llBounce 1s ease-in-out infinite`,animationDelay:`${d}ms` }} />)}
                 </div>
               </div>
@@ -254,9 +254,9 @@ export default function LifeLinkChatbot() {
               <p style={{ color:'rgba(94,234,212,.5)',fontSize:9,textTransform:'uppercase',letterSpacing:1.5,fontWeight:800,marginBottom:6,margin:'0 0 6px 0' }}>Suggested Questions</p>
               <div style={{ display:'flex',flexWrap:'wrap',gap:6 }}>
                 {QUICK.map(q => (
-                  <button key={q} onClick={() => send(q)} style={{ fontSize:10,padding:'5px 10px',background:'rgba(20,184,166,.1)',border:'1px solid rgba(20,184,166,.3)',color:'#5eead4',borderRadius:20,cursor:'pointer',fontWeight:700,transition:'all .2s' }}
-                    onMouseEnter={e=>(e.currentTarget.style.background='rgba(20,184,166,.25)')}
-                    onMouseLeave={e=>(e.currentTarget.style.background='rgba(20,184,166,.1)')}>
+                  <button key={q} onClick={() => send(q)} style={{ fontSize:10,padding:'5px 10px',background:'rgba(45,212,191,.1)',border:'1px solid rgba(45,212,191,.3)',color:'#5eead4',borderRadius:20,cursor:'pointer',fontWeight:700,transition:'all .2s' }}
+                    onMouseEnter={e=>(e.currentTarget.style.background='rgba(45,212,191,.25)')}
+                    onMouseLeave={e=>(e.currentTarget.style.background='rgba(45,212,191,.1)')}>
                     {q}
                   </button>
                 ))}
@@ -265,21 +265,21 @@ export default function LifeLinkChatbot() {
           )}
 
           {/* Input */}
-          <div style={{ padding:'10px 12px',borderTop:'1px solid rgba(20,184,166,.2)',display:'flex',gap:8,alignItems:'center',background:'rgba(7,30,26,1)',flexShrink:0 }}>
+          <div style={{ padding:'10px 12px',borderTop:'1px solid rgba(45,212,191,.2)',display:'flex',gap:8,alignItems:'center',background:'rgba(7,30,26,1)',flexShrink:0 }}>
             <input
               ref={inputRef}
               value={input}
               onChange={e => setInput(e.target.value)}
               onKeyDown={e => { if (e.key==='Enter'&&!e.shiftKey){e.preventDefault();send(input);} }}
               placeholder="Ask about LifeLink..."
-              style={{ flex:1,background:'rgba(10,40,34,.8)',border:'1px solid rgba(20,184,166,.3)',borderRadius:14,padding:'9px 14px',color:'white',fontSize:12,outline:'none',fontFamily:'inherit' }}
-              onFocus={e=>(e.target.style.borderColor='rgba(20,184,166,.7)')}
-              onBlur={e=>(e.target.style.borderColor='rgba(20,184,166,.3)')}
+              style={{ flex:1,background:'rgba(10,40,34,.8)',border:'1px solid rgba(45,212,191,.3)',borderRadius:14,padding:'9px 14px',color:'white',fontSize:12,outline:'none',fontFamily:'inherit' }}
+              onFocus={e=>(e.target.style.borderColor='rgba(45,212,191,.7)')}
+              onBlur={e=>(e.target.style.borderColor='rgba(45,212,191,.3)')}
             />
             <button
               onClick={() => send(input)}
               disabled={!input.trim()||typing}
-              style={{ width:38,height:38,borderRadius:12,background:input.trim()&&!typing?'#0d9488':'rgba(20,184,166,.25)',border:'none',display:'flex',alignItems:'center',justifyContent:'center',cursor:input.trim()&&!typing?'pointer':'not-allowed',transition:'background .2s',flexShrink:0 }}>
+              style={{ width:38,height:38,borderRadius:12,background:input.trim()&&!typing?'#14b8a6':'rgba(45,212,191,.25)',border:'none',display:'flex',alignItems:'center',justifyContent:'center',cursor:input.trim()&&!typing?'pointer':'not-allowed',transition:'background .2s',flexShrink:0 }}>
               <Send style={{ width:16,height:16,color:'white' }} />
             </button>
           </div>

@@ -435,8 +435,8 @@ export default function AuthPage({ onAuth }: { onAuth: (user: any) => void }) {
               <div className="flex items-center gap-1.5 flex-1">
                 {['role', 'info', 'otp'].map((s, i) => (
                   <React.Fragment key={s}>
-                    <div className={`w-2 h-2 rounded-full transition-all ${step === s ? 'bg-teal-400 scale-125' : ['role', 'info', 'otp'].indexOf(step) > i ? 'bg-teal-600' : 'bg-teal-900'}`} />
-                    {i < 2 && <div className={`flex-1 h-px transition-all ${['role', 'info', 'otp'].indexOf(step) > i ? 'bg-teal-600' : 'bg-teal-900'}`} />}
+                    <div className={`w-2 h-2 rounded-full transition-all ${step === s ? 'bg-teal-400 scale-125' : ['role', 'info', 'otp'].indexOf(step) > i ? 'bg-teal-500' : 'bg-teal-900'}`} />
+                    {i < 2 && <div className={`flex-1 h-px transition-all ${['role', 'info', 'otp'].indexOf(step) > i ? 'bg-teal-500' : 'bg-teal-900'}`} />}
                   </React.Fragment>
                 ))}
               </div>

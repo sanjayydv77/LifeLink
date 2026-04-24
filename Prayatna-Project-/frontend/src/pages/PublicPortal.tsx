@@ -433,7 +433,7 @@ function ExpandedHospitalCard({
       {/* Know More Button */}
       <button
         onClick={() => onKnowMore(hospital)}
-        className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg bg-gradient-to-r from-teal-600 via-teal-500 to-emerald-500 hover:from-teal-500 hover:via-teal-400 hover:to-emerald-400 text-white font-extrabold text-sm tracking-wide transition-all shadow-lg shadow-teal-900/50 hover:shadow-teal-500/40 hover:scale-[1.02]"
+        className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg bg-gradient-to-r from-teal-500 via-teal-500 to-emerald-500 hover:from-teal-500 hover:via-teal-400 hover:to-emerald-400 text-white font-extrabold text-sm tracking-wide transition-all shadow-lg shadow-teal-900/50 hover:shadow-teal-500/40 hover:scale-[1.02]"
       >
         <Info className="w-4 h-4" />
         Know More
@@ -1205,21 +1205,21 @@ export default function PublicPortal() {
                     <div className="flex items-center gap-3 mb-4 break-all">
                       <div className="bg-teal-900/50 p-2 rounded-lg"><User className="text-teal-400 w-5 h-5"/></div>
                       <div>
-                        <div className="text-[10px] text-teal-500 uppercase font-bold tracking-widest">Responder</div>
+                        <div className="text-[10px] text-teal-400 uppercase font-bold tracking-widest">Responder</div>
                         <div className="font-bold text-white text-lg">{sosDriverInfo.name}</div>
                       </div>
                     </div>
                     <div className="grid grid-cols-2 gap-3 mb-4">
                       <div>
-                        <div className="text-[10px] text-teal-500 uppercase font-bold tracking-widest mb-1">Vehicle</div>
+                        <div className="text-[10px] text-teal-400 uppercase font-bold tracking-widest mb-1">Vehicle</div>
                         <div className="font-bold text-gray-200 flex items-center gap-2"><Car className="w-4 h-4"/> {sosDriverInfo.vehicle}</div>
                       </div>
                       <div>
-                        <div className="text-[10px] text-teal-500 uppercase font-bold tracking-widest mb-1">ETA</div>
+                        <div className="text-[10px] text-teal-400 uppercase font-bold tracking-widest mb-1">ETA</div>
                         <div className="font-bold text-gray-200 flex items-center gap-2"><Clock className="w-4 h-4"/> {sosDriverInfo.eta}</div>
                       </div>
                     </div>
-                    <a href={`tel:${sosDriverInfo.phone}`} className="flex items-center justify-center w-full py-3 bg-teal-600 hover:bg-teal-500 text-white rounded-lg font-bold transition-all shadow-lg gap-2 cursor-pointer">
+                    <a href={`tel:${sosDriverInfo.phone}`} className="flex items-center justify-center w-full py-3 bg-teal-500 hover:bg-teal-400 text-white rounded-lg font-bold transition-all shadow-lg gap-2 cursor-pointer">
                       <Phone className="w-4 h-4" />
                       Contact Driver
                     </a>
@@ -1358,7 +1358,7 @@ export default function PublicPortal() {
                           ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
                           : bookingModal.type === 'Bed' 
                             ? 'bg-emerald-600 hover:bg-emerald-500 text-white' 
-                            : 'bg-teal-600 hover:bg-teal-500 text-white'
+                            : 'bg-teal-500 hover:bg-teal-400 text-white'
                     }`}
                   >
                     {bookingStatus === 'loading' ? (

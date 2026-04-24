@@ -870,7 +870,7 @@ export default function HospitalPortal() {
                 {(['browse', 'incoming', 'outgoing'] as const).map(v => (
                   <button key={v} onClick={() => setSharingView(v)}
                     className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all ${
-                      sharingView === v ? 'bg-teal-600 text-white shadow-lg' : 'bg-teal-900/30 text-teal-400 hover:bg-teal-900/60 border border-teal-800/40'
+                      sharingView === v ? 'bg-teal-500 text-white shadow-lg' : 'bg-teal-900/30 text-teal-400 hover:bg-teal-900/60 border border-teal-800/40'
                     }`}>
                     {v === 'browse' ? <><Share2 className="w-3.5 h-3.5" />Browse</> :
                      v === 'incoming' ? <><Inbox className="w-3.5 h-3.5" />Incoming {incomingRequests.filter(r => r.status === 'pending').length > 0 && <span className="ml-1 bg-rose-500 text-white rounded-full text-[9px] px-1.5">{incomingRequests.filter(r => r.status === 'pending').length}</span>}</> :
@@ -892,7 +892,7 @@ export default function HospitalPortal() {
                         </div>
                         <button
                           onClick={() => { setRequestModal({ open: true, hospital: h }); setRequestForm({ resourceType: 'oxygen', quantity: '10', message: '' }); }}
-                          className="px-3 py-1.5 bg-teal-600 hover:bg-teal-500 text-white text-xs font-bold rounded-lg transition-all flex items-center gap-1"
+                          className="px-3 py-1.5 bg-teal-500 hover:bg-teal-400 text-white text-xs font-bold rounded-lg transition-all flex items-center gap-1"
                         >
                           <Send className="w-3 h-3" /> Request
                         </button>
@@ -942,7 +942,7 @@ export default function HospitalPortal() {
                         </div>
                         {req.status === 'pending' && (
                           <button onClick={() => { setRespondModal({ open: true, req }); setRespondNote(''); }}
-                            className="ml-3 shrink-0 px-3 py-1.5 bg-teal-700 hover:bg-teal-600 text-white text-xs font-bold rounded-lg transition-all">
+                            className="ml-3 shrink-0 px-3 py-1.5 bg-teal-700 hover:bg-teal-500 text-white text-xs font-bold rounded-lg transition-all">
                             Respond
                           </button>
                         )}
@@ -1017,7 +1017,7 @@ export default function HospitalPortal() {
                           className="w-full bg-[#071e1a] border border-teal-800/50 rounded-lg px-4 py-2.5 text-white focus:border-teal-500 outline-none resize-none placeholder:text-teal-700" />
                       </div>
                       <button onClick={sendResourceRequest} disabled={sharingLoading}
-                        className="w-full py-3 bg-teal-600 hover:bg-teal-500 disabled:opacity-50 text-white font-bold rounded-xl transition-all flex items-center justify-center gap-2">
+                        className="w-full py-3 bg-teal-500 hover:bg-teal-400 disabled:opacity-50 text-white font-bold rounded-xl transition-all flex items-center justify-center gap-2">
                         {sharingLoading ? 'Sending...' : <><Send className="w-4 h-4" /> Send Request</>}
                       </button>
                     </div>
@@ -1128,7 +1128,7 @@ export default function HospitalPortal() {
                       className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-teal-900/40 hover:bg-teal-800/50 border border-teal-700/40 text-teal-300 rounded-xl text-xs font-bold transition-all">
                       <Download className="w-3.5 h-3.5" /> Download Template
                     </button>
-                    <label className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-teal-600 hover:bg-teal-500 text-white rounded-xl text-xs font-bold cursor-pointer transition-all">
+                    <label className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-teal-500 hover:bg-teal-400 text-white rounded-xl text-xs font-bold cursor-pointer transition-all">
                       <Upload className="w-3.5 h-3.5" /> Upload CSV
                       <input type="file" accept=".csv" className="hidden" onChange={handleCsvUpload} />
                     </label>
@@ -1269,7 +1269,7 @@ export default function HospitalPortal() {
                     Cancel
                   </button>
                   <button onClick={saveProfile} disabled={profileSaving}
-                    className="flex-1 py-3 rounded-xl bg-teal-600 hover:bg-teal-500 disabled:opacity-50 text-white font-bold text-sm transition-all flex items-center justify-center gap-2">
+                    className="flex-1 py-3 rounded-xl bg-teal-500 hover:bg-teal-400 disabled:opacity-50 text-white font-bold text-sm transition-all flex items-center justify-center gap-2">
                     {profileSaving ? <><div className="w-4 h-4 border-2 border-t-white border-white/30 rounded-full animate-spin" />Saving...</> : <><Save className="w-4 h-4" />Save Profile</>}
                   </button>
                 </div>
