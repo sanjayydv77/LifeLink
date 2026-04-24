@@ -315,6 +315,7 @@ export default function HospitalPortal() {
   const [editingProfile, setEditingProfile] = useState(false);
   const [profileSaving, setProfileSaving] = useState(false);
   const [profileSaved, setProfileSaved] = useState(false);
+  const [profileLoading, setProfileLoading] = useState(false);
   const [csvView, setCsvView] = useState<'none' | 'preview' | 'uploading' | 'done'>('none');
   const [profileForm, setProfileForm] = useState({
     name: '', address: '', city: '', state: '', zipCode: '',
@@ -324,30 +325,41 @@ export default function HospitalPortal() {
     ambulances_available: '', ventilators: '',
   });
 
-  // Sync profileForm when hospitalInfo loads
+  // Fetch full hospital profile from DB whenever the panel opens
   useEffect(() => {
-    if (hospitalInfo) {
-      setProfileForm({
-        name: hospitalInfo.name || '',
-        address: hospitalInfo.address || '',
-        city: hospitalInfo.city || '',
-        state: hospitalInfo.state || '',
-        zipCode: hospitalInfo.zipCode || '',
-        phone: hospitalInfo.phone || '',
-        email: hospitalInfo.email || '',
-        latitude: String(hospitalInfo.latitude || ''),
-        longitude: String(hospitalInfo.longitude || ''),
-        specializations: Array.isArray(hospitalInfo.specializations) ? hospitalInfo.specializations.join(', ') : (hospitalInfo.specializations || ''),
-        openingTime: (hospitalInfo as any).openingTime || '08:00',
-        closingTime: (hospitalInfo as any).closingTime || '20:00',
-        totalBeds: String(hospitalInfo.totalBeds || ''),
-        icu_beds_available: String((hospitalInfo as any).icu_beds_available || ''),
-        oxygen_cylinders_available: String((hospitalInfo as any).oxygen_cylinders_available || ''),
-        ambulances_available: String((hospitalInfo as any).ambulances_available || ''),
-        ventilators: String((hospitalInfo as any).ventilators || ''),
-      });
-    }
-  }, [hospitalInfo]);
+    if (!profilePanelOpen || !hospitalInfo?.id) return;
+    setProfileLoading(true);
+    fetch(`${API_URL}/api/hospitals`)
+      .then(r => r.json())
+      .then(data => {
+        const list: any[] = data.data || data || [];
+        const h = list.find((x: any) => x.id === hospitalInfo.id);
+        if (!h) return;
+        setProfileForm({
+          name: h.name || '',
+          address: h.address || '',
+          city: h.city || '',
+          state: h.state || '',
+          zipCode: h.zipCode || '',
+          phone: h.phone || '',
+          email: h.email || '',
+          latitude: String(h.latitude || ''),
+          longitude: String(h.longitude || ''),
+          specializations: Array.isArray(h.specializations)
+            ? h.specializations.join(', ')
+            : (h.specializations || ''),
+          openingTime: h.openingTime || '08:00',
+          closingTime: h.closingTime || '20:00',
+          totalBeds: String(h.totalBeds ?? h.total_beds ?? ''),
+          icu_beds_available: String(h.icu_beds_available ?? h.icuBeds ?? ''),
+          oxygen_cylinders_available: String(h.oxygen_cylinders_available ?? ''),
+          ambulances_available: String(h.ambulances_available ?? h.ambulances ?? ''),
+          ventilators: String(h.ventilators ?? ''),
+        });
+      })
+      .catch(err => console.error('Profile fetch error:', err))
+      .finally(() => setProfileLoading(false));
+  }, [profilePanelOpen, hospitalInfo?.id]);
 
   const saveProfile = async () => {
     if (!hospitalInfo?.id) return;
@@ -1085,6 +1097,13 @@ export default function HospitalPortal() {
             </div>
 
             <div className="flex-1 p-6 space-y-6">
+              {profileLoading && (
+                <div className="flex items-center justify-center py-12 gap-3 text-teal-400">
+                  <div className="w-5 h-5 border-2 border-t-teal-400 border-teal-800 rounded-full animate-spin" />
+                  <span className="text-sm">Loading profile from database...</span>
+                </div>
+              )}
+              {!profileLoading && (<>
 
               {/* CSV Upload Section */}
               <div className="bg-gradient-to-br from-teal-950/40 to-[#041512] border border-teal-800/40 rounded-xl p-4">
@@ -1255,6 +1274,7 @@ export default function HospitalPortal() {
                   </button>
                 </div>
               )}
+              </>)}
             </div>
           </div>
         </div>
