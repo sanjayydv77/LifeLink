@@ -1,9 +1,38 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   Heart, Phone, User, Mail, Building2, Car, ChevronRight,
   ChevronLeft, Shield, Eye, EyeOff, CheckCircle2, Loader2,
   Ambulance, Stethoscope, Users, ArrowRight, Lock, RefreshCw
 } from 'lucide-react';
+import ClayScene from '../components/ClayCharacters';
+
+// Inject login page keyframes once
+const LOGIN_STYLE = `
+@keyframes llOrb { 0%,100%{transform:translateY(0) scale(1)} 50%{transform:translateY(-24px) scale(1.07)} }
+@keyframes llSpin { from{transform:rotate(0)} to{transform:rotate(360deg)} }
+@keyframes llFadeUp { from{opacity:0;transform:translateY(28px)} to{opacity:1;transform:translateY(0)} }
+@keyframes llPing { 0%{transform:scale(1);opacity:.7} 100%{transform:scale(2.4);opacity:0} }
+@keyframes llFloat2 { 0%,100%{transform:translateY(0) rotate(0deg)} 33%{transform:translateY(-14px) rotate(6deg)} 66%{transform:translateY(8px) rotate(-4deg)} }
+`;
+if (typeof document !== 'undefined' && !document.getElementById('ll-auth-styles')) {
+  const el = document.createElement('style'); el.id = 'll-auth-styles'; el.textContent = LOGIN_STYLE; document.head.appendChild(el);
+}
+
+const PARTICLES = Array.from({length:22},(_,i)=>({
+  x: Math.random()*100, y: Math.random()*100,
+  size: 1+Math.random()*2.5,
+  delay: Math.random()*6, dur: 4+Math.random()*5,
+  opacity: 0.06+Math.random()*0.12,
+}));
+
+const ICONS_BG = [
+  {Icon: Heart, x:8, y:12, delay:'0s', size:22},
+  {Icon: Stethoscope, x:88, y:18, delay:'1.2s', size:20},
+  {Icon: Ambulance, x:6, y:72, delay:'2.1s', size:24},
+  {Icon: Building2, x:90, y:68, delay:'0.7s', size:20},
+  {Icon: Shield, x:50, y:6, delay:'1.8s', size:18},
+  {Icon: Users, x:50, y:88, delay:'0.4s', size:18},
+];
 
 const API = 'http://localhost:5000';
 
@@ -390,53 +419,112 @@ export default function AuthPage({ onAuth }: { onAuth: (user: any) => void }) {
     return 'Verify OTP';
   };
 
+  const [mouse, setMouse] = useState({x:50,y:50});
+  const [tilt, setTilt] = useState({x:0,y:0});
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  const onMouseMove = (e: React.MouseEvent) => {
+    const nx = (e.clientX/window.innerWidth)*100;
+    const ny = (e.clientY/window.innerHeight)*100;
+    setMouse({x:nx,y:ny});
+    if (cardRef.current) {
+      const r = cardRef.current.getBoundingClientRect();
+      const cx = e.clientX - r.left - r.width/2;
+      const cy = e.clientY - r.top - r.height/2;
+      setTilt({x: (cy/r.height)*-10, y: (cx/r.width)*10});
+    }
+  };
+  const onMouseLeave = () => setTilt({x:0,y:0});
+
   return (
-    <div className="min-h-screen bg-[#071E1A] flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Background glow */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-32 -left-32 w-96 h-96 bg-teal-500/5 rounded-full blur-3xl" />
-        <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-emerald-500/5 rounded-full blur-3xl" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-teal-900/10 rounded-full blur-3xl" />
+    <div
+      className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden"
+      style={{background:'#071E1A', cursor:'default'}}
+      onMouseMove={onMouseMove}
+      onMouseLeave={onMouseLeave}
+    >
+      {/* Mouse spotlight */}
+      <div className="absolute inset-0 pointer-events-none" style={{
+        background:`radial-gradient(600px circle at ${mouse.x}% ${mouse.y}%, rgba(20,184,166,0.07) 0%, transparent 70%)`,
+        transition:'background 0.08s ease',
+      }}/>
+
+      {/* Animated background orbs */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div style={{position:'absolute',top:`${20+(mouse.y-50)*0.08}%`,left:`${-8+(mouse.x-50)*0.06}%`,width:420,height:420,borderRadius:'50%',background:'radial-gradient(circle,rgba(20,184,166,0.09) 0%,transparent 70%)',filter:'blur(60px)',animation:'llOrb 7s ease-in-out infinite',transition:'top 0.4s,left 0.4s'}}/>
+        <div style={{position:'absolute',bottom:`${10+(mouse.y-50)*-0.07}%`,right:`${-6+(mouse.x-50)*-0.05}%`,width:380,height:380,borderRadius:'50%',background:'radial-gradient(circle,rgba(16,185,129,0.08) 0%,transparent 70%)',filter:'blur(50px)',animation:'llOrb 9s ease-in-out infinite 2s',transition:'bottom 0.4s,right 0.4s'}}/>
+        <div style={{position:'absolute',top:'45%',left:'45%',width:600,height:600,borderRadius:'50%',background:'radial-gradient(circle,rgba(20,184,166,0.04) 0%,transparent 70%)',filter:'blur(80px)',transform:'translate(-50%,-50%)'}}/>
+        {/* Rotating ring */}
+        <div style={{position:'absolute',top:'50%',left:'50%',width:700,height:700,borderRadius:'50%',border:'1px solid rgba(20,184,166,0.04)',transform:'translate(-50%,-50%)',animation:'llSpin 40s linear infinite'}}/>
+        <div style={{position:'absolute',top:'50%',left:'50%',width:500,height:500,borderRadius:'50%',border:'1px solid rgba(20,184,166,0.06)',transform:'translate(-50%,-50%)',animation:'llSpin 28s linear infinite reverse'}}/>
       </div>
 
-      {/* Grid pattern */}
-      <div className="absolute inset-0 pointer-events-none opacity-[0.03]"
-        style={{ backgroundImage: 'linear-gradient(#14B8A6 1px,transparent 1px),linear-gradient(90deg,#14B8A6 1px,transparent 1px)', backgroundSize: '40px 40px' }} />
+      {/* Grid */}
+      <div className="absolute inset-0 pointer-events-none" style={{backgroundImage:'linear-gradient(rgba(20,184,166,1) 1px,transparent 1px),linear-gradient(90deg,rgba(20,184,166,1) 1px,transparent 1px)',backgroundSize:'48px 48px',opacity:0.022}}/>
 
-      <div className="w-full max-w-md relative z-10">
+      {/* Floating particles */}
+      <div className="absolute inset-0 pointer-events-none">
+        {PARTICLES.map((p,i)=>(
+          <div key={i} style={{position:'absolute',left:`${p.x}%`,top:`${p.y}%`,width:p.size,height:p.size,borderRadius:'50%',background:'rgba(45,212,191,1)',opacity:p.opacity,animation:`llFloat2 ${p.dur}s ease-in-out infinite ${p.delay}s`}}/>
+        ))}
+      </div>
+
+
+      {/* Clay characters — parallax with mouse */}
+      <ClayScene mouseX={mouse.x} mouseY={mouse.y} />
+
+      {/* Content */}
+      <div className="w-full max-w-md relative z-10" style={{animation:'llFadeUp 0.6s ease both'}}>
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-3 mb-4">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-teal-400 to-emerald-500 flex items-center justify-center shadow-lg shadow-teal-500/30">
-              <Heart className="w-6 h-6 text-white fill-white" />
+          <div className="inline-flex items-center gap-3 mb-3">
+            <div style={{width:52,height:52,borderRadius:16,background:'linear-gradient(135deg,#2dd4bf,#10b981)',display:'flex',alignItems:'center',justifyContent:'center',boxShadow:'0 0 32px rgba(45,212,191,0.4)',position:'relative'}}>
+              <Heart style={{width:24,height:24,color:'white',fill:'white'}}/>
+              <div style={{position:'absolute',inset:0,borderRadius:16,border:'1px solid rgba(45,212,191,0.5)',animation:'llPing 2.5s ease-out infinite'}}/>
             </div>
             <div className="text-left">
-              <h1 className="text-2xl font-extrabold text-white tracking-tight">LifeLink</h1>
-              <p className="text-teal-400/70 text-xs font-medium">Emergency Response Network</p>
+              <h1 className="text-3xl font-extrabold text-white tracking-tight" style={{textShadow:'0 0 40px rgba(45,212,191,0.3)'}}>LifeLink</h1>
+              <p className="text-teal-400/70 text-xs font-semibold tracking-widest uppercase">Emergency Response Network</p>
             </div>
           </div>
         </div>
 
-        {/* Card */}
-        <div className="bg-[#0b2e28]/80 backdrop-blur-xl border border-teal-700/30 rounded-3xl shadow-2xl shadow-teal-900/30 overflow-hidden">
+        {/* Card with 3D tilt */}
+        <div
+          ref={cardRef}
+          style={{
+            background:'rgba(11,46,40,0.82)',
+            backdropFilter:'blur(24px)',
+            border:'1px solid rgba(45,212,191,0.18)',
+            borderRadius:28,
+            boxShadow:`0 32px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(45,212,191,0.08), inset 0 1px 0 rgba(45,212,191,0.1)`,
+            overflow:'hidden',
+            transform:`perspective(1000px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) scale(1.01)`,
+            transition:'transform 0.15s ease',
+          }}
+        >
+          {/* Card shine on tilt */}
+          <div style={{position:'absolute',inset:0,background:`radial-gradient(circle at ${50+tilt.y*3}% ${50+tilt.x*-3}%, rgba(45,212,191,0.06) 0%, transparent 60%)`,pointerEvents:'none',zIndex:0,transition:'background 0.15s'}}/>
+
           {/* Tabs */}
-          <div className="flex border-b border-teal-800/40">
-            {(['register', 'login'] as const).map(m => (
-              <button key={m} onClick={() => switchMode(m)}
-                className={`flex-1 py-4 text-sm font-bold transition-all ${mode === m ? 'text-teal-300 bg-teal-900/30 border-b-2 border-teal-400' : 'text-teal-600/60 hover:text-teal-400'}`}>
-                {m === 'register' ? 'Create Account' : 'Sign In'}
+          <div className="flex border-b border-teal-800/40" style={{position:'relative',zIndex:1}}>
+            {(['register','login'] as const).map(m=>(
+              <button key={m} onClick={()=>switchMode(m)}
+                className={`flex-1 py-4 text-sm font-bold transition-all ${mode===m?'text-teal-300 border-b-2 border-teal-400':'text-teal-600/60 hover:text-teal-400'}`}
+                style={{background:mode===m?'rgba(20,184,166,0.1)':'transparent'}}>
+                {m==='register'?'Create Account':'Sign In'}
               </button>
             ))}
           </div>
 
           {/* Step indicator */}
-          <div className="px-6 pt-5 pb-2 flex items-center gap-2">
-            {mode === 'register' && (
+          <div className="px-6 pt-5 pb-2 flex items-center gap-2" style={{position:'relative',zIndex:1}}>
+            {mode==='register'&&(
               <div className="flex items-center gap-1.5 flex-1">
-                {['role', 'info', 'otp'].map((s, i) => (
+                {['role','info','otp'].map((s,i)=>(
                   <React.Fragment key={s}>
-                    <div className={`w-2 h-2 rounded-full transition-all ${step === s ? 'bg-teal-400 scale-125' : ['role', 'info', 'otp'].indexOf(step) > i ? 'bg-teal-500' : 'bg-teal-900'}`} />
-                    {i < 2 && <div className={`flex-1 h-px transition-all ${['role', 'info', 'otp'].indexOf(step) > i ? 'bg-teal-500' : 'bg-teal-900'}`} />}
+                    <div className={`w-2 h-2 rounded-full transition-all ${step===s?'bg-teal-400 scale-125':['role','info','otp'].indexOf(step)>i?'bg-teal-500':'bg-teal-900'}`}/>
+                    {i<2&&<div className={`flex-1 h-px transition-all ${['role','info','otp'].indexOf(step)>i?'bg-teal-500':'bg-teal-900'}`}/>}
                   </React.Fragment>
                 ))}
               </div>
@@ -445,12 +533,11 @@ export default function AuthPage({ onAuth }: { onAuth: (user: any) => void }) {
           </div>
 
           {/* Content */}
-          <div className="px-6 pb-6 pt-2">
+          <div className="px-6 pb-6 pt-2" style={{position:'relative',zIndex:1}}>
             {stepContent()}
           </div>
         </div>
 
-        {/* Footer */}
         <p className="text-center text-teal-700/50 text-xs mt-6">
           Secured with OTP authentication · LifeLink © 2026
         </p>
