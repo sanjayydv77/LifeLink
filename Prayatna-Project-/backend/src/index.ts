@@ -17,6 +17,7 @@ import appointmentRoutes from './routes/appointmentRoutes';
 import bedBookingRoutes from './routes/bedBookingRoutes';
 import webhookRoutes from './routes/webhookRoutes';
 import superAdminRoutes from './routes/superAdminRoutes';
+import resourceSharingRoutes from './routes/resourceSharingRoutes';
 
 dotenv.config();
 
@@ -58,6 +59,7 @@ app.use('/api/appointments', appointmentRoutes);
 app.use('/api/bed-bookings', bedBookingRoutes);
 app.use('/api/webhooks', webhookRoutes);
 app.use('/api/super-admin', superAdminRoutes);
+app.use('/api/resource-requests', resourceSharingRoutes);
 
 app.get('/api', (req: Request, res: Response) => {
   res.json({

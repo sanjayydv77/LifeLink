@@ -4,7 +4,8 @@ import {
   Wind, Droplets, Car, CheckCircle, XCircle, Clock, AlertTriangle,
   Phone, User, Stethoscope, RefreshCw, ChevronRight, X, Ambulance,
   HeartPulse, CalendarCheck, Building2, LogOut, Users, Package,
-  Save, Edit3, TrendingUp, Minus, Plus
+  Save, Edit3, TrendingUp, Minus, Plus, Share2, Send, Inbox, ArrowLeftRight,
+  UserCircle2, Upload, Download, FileSpreadsheet, Pencil, MapPin, Mail, Globe
 } from 'lucide-react';
 import { io } from 'socket.io-client';
 
@@ -26,6 +27,15 @@ interface AmbulanceNotif {
   patient_type: string; patient_condition: string; number_of_patients: number;
   driver_contact: string; eta_minutes: number; status: string;
   hospital_response?: string; createdAt: string;
+}
+interface ResourceShareReq {
+  id: string;
+  fromHospitalId: string; fromHospitalName: string;
+  toHospitalId: string; toHospitalName: string;
+  resourceType: string; quantity: number;
+  message: string; status: 'pending' | 'agreed' | 'denied';
+  responseMessage: string | null;
+  createdAt: string;
 }
 
 // ─── Stat Card ───────────────────────────────────────────────────────────────
@@ -137,7 +147,17 @@ export default function HospitalPortal() {
   const [loading, setLoading] = useState(true);
 
   // Dynamic hospital info from JWT
-  const [hospitalInfo, setHospitalInfo] = useState<{ name: string; id: string; city?: string } | null>(null);
+  // Dynamic hospital info from JWT
+  const [hospitalInfo, setHospitalInfo] = useState<{
+    name: string; id: string; city?: string;
+    address?: string; state?: string; zipCode?: string;
+    phone?: string; email?: string;
+    latitude?: number; longitude?: number;
+    specializations?: string[] | string;
+    totalBeds?: number; icu_beds_available?: number;
+    oxygen_cylinders_available?: number; ambulances_available?: number;
+    ventilators?: number; openingTime?: string; closingTime?: string;
+  } | null>(null);
   const [profileError, setProfileError] = useState('');
 
   const [inventory, setInventory] = useState({
@@ -158,7 +178,18 @@ export default function HospitalPortal() {
       .then(d => {
         if (d.success && d.data.hospital) {
           const h = d.data.hospital;
-          setHospitalInfo({ name: h.name, id: h.id, city: h.city });
+          setHospitalInfo({
+            name: h.name, id: h.id, city: h.city,
+            address: h.address, state: h.state, zipCode: h.zipCode,
+            phone: h.phone, email: h.email,
+            latitude: h.latitude, longitude: h.longitude,
+            specializations: h.specializations,
+            totalBeds: h.totalBeds,
+            icu_beds_available: h.icu_beds_available ?? h.icuBeds,
+            oxygen_cylinders_available: h.oxygen_cylinders_available,
+            ambulances_available: h.ambulances_available ?? h.ambulances,
+            ventilators: h.ventilators,
+          });
           // Pre-populate inventory from DB if AIIMS (pre-loaded data)
           setInventory({
             generalBeds: h.totalBeds || 0,
@@ -225,6 +256,232 @@ export default function HospitalPortal() {
     };
   }, []);
 
+  // ─── Resource Sharing State ────────────────────────────────────────────────
+  const [incomingRequests, setIncomingRequests] = useState<ResourceShareReq[]>([]);
+  const [outgoingRequests, setOutgoingRequests] = useState<ResourceShareReq[]>([]);
+  const [allHospitals, setAllHospitals] = useState<any[]>([]);
+  const [sharingView, setSharingView] = useState<'browse' | 'incoming' | 'outgoing'>('browse');
+  const [requestModal, setRequestModal] = useState<{ open: boolean; hospital: any | null }>({ open: false, hospital: null });
+  const [requestForm, setRequestForm] = useState({ resourceType: 'oxygen', quantity: '10', message: '' });
+  const [respondModal, setRespondModal] = useState<{ open: boolean; req: ResourceShareReq | null }>({ open: false, req: null });
+  const [respondNote, setRespondNote] = useState('');
+  const [sharingLoading, setSharingLoading] = useState(false);
+  const RESOURCE_LABELS: Record<string, string> = { oxygen: 'Oxygen Cylinders', icuBeds: 'ICU Beds', generalBeds: 'General Beds', ambulances: 'Ambulances', ventilators: 'Ventilators' };
+  const fetchSharingData = useCallback(async () => {
+    if (!hospitalInfo?.id) return;
+    const [receivedRes, sentRes, hospitalsRes] = await Promise.all([
+      fetch(`${API_URL}/api/resource-requests/received/${hospitalInfo.id}`).then(r => r.json()).catch(() => ({ data: [] })),
+      fetch(`${API_URL}/api/resource-requests/sent/${hospitalInfo.id}`).then(r => r.json()).catch(() => ({ data: [] })),
+      fetch(`${API_URL}/api/resource-requests/hospitals`).then(r => r.json()).catch(() => ({ data: [] })),
+    ]);
+    setIncomingRequests(receivedRes.data || []);
+    setOutgoingRequests(sentRes.data || []);
+    setAllHospitals((hospitalsRes.data || []).filter((h: any) => h.id !== hospitalInfo.id));
+  }, [hospitalInfo?.id]);
+  useEffect(() => { fetchSharingData(); }, [fetchSharingData]);
+  useEffect(() => {
+    const onNew = (data: any) => { if (data?.toHospitalId === hospitalInfo?.id) setIncomingRequests(prev => [data.request, ...prev]); };
+    const onResp = (data: any) => { if (data?.toHospitalId === hospitalInfo?.id) setOutgoingRequests(prev => prev.map(r => r.id === data.request.id ? data.request : r)); };
+    socket.on('resource_request_new', onNew);
+    socket.on('resource_request_response', onResp);
+    return () => { socket.off('resource_request_new', onNew); socket.off('resource_request_response', onResp); };
+  }, [hospitalInfo?.id]);
+  const sendResourceRequest = async () => {
+    if (!requestModal.hospital || !hospitalInfo) return;
+    setSharingLoading(true);
+    try {
+      await fetch(`${API_URL}/api/resource-requests`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ fromHospitalId: hospitalInfo.id, fromHospitalName: hospitalInfo.name, toHospitalId: requestModal.hospital.id, toHospitalName: requestModal.hospital.name, resourceType: requestForm.resourceType, quantity: Number(requestForm.quantity), message: requestForm.message }) });
+      setRequestModal({ open: false, hospital: null });
+      setRequestForm({ resourceType: 'oxygen', quantity: '10', message: '' });
+      setSharingView('outgoing');
+      await fetchSharingData();
+    } catch (e) { console.error(e); }
+    setSharingLoading(false);
+  };
+  const respondToRequest = async (status: 'agreed' | 'denied') => {
+    if (!respondModal.req) return;
+    setSharingLoading(true);
+    try {
+      await fetch(`${API_URL}/api/resource-requests/${respondModal.req.id}/respond`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status, responseMessage: respondNote }) });
+      setRespondModal({ open: false, req: null });
+      setRespondNote('');
+      await fetchSharingData();
+    } catch (e) { console.error(e); }
+    setSharingLoading(false);
+  };
+
+  // ─── Hospital Profile State ───────────────────────────────────────────
+  const [profilePanelOpen, setProfilePanelOpen] = useState(false);
+  const [editingProfile, setEditingProfile] = useState(false);
+  const [profileSaving, setProfileSaving] = useState(false);
+  const [profileSaved, setProfileSaved] = useState(false);
+  const [csvView, setCsvView] = useState<'none' | 'preview' | 'uploading' | 'done'>('none');
+  const [profileForm, setProfileForm] = useState({
+    name: '', address: '', city: '', state: '', zipCode: '',
+    phone: '', email: '', latitude: '', longitude: '',
+    specializations: '', openingTime: '08:00', closingTime: '20:00',
+    totalBeds: '', icu_beds_available: '', oxygen_cylinders_available: '',
+    ambulances_available: '', ventilators: '',
+  });
+
+  // Sync profileForm when hospitalInfo loads
+  useEffect(() => {
+    if (hospitalInfo) {
+      setProfileForm({
+        name: hospitalInfo.name || '',
+        address: hospitalInfo.address || '',
+        city: hospitalInfo.city || '',
+        state: hospitalInfo.state || '',
+        zipCode: hospitalInfo.zipCode || '',
+        phone: hospitalInfo.phone || '',
+        email: hospitalInfo.email || '',
+        latitude: String(hospitalInfo.latitude || ''),
+        longitude: String(hospitalInfo.longitude || ''),
+        specializations: Array.isArray(hospitalInfo.specializations) ? hospitalInfo.specializations.join(', ') : (hospitalInfo.specializations || ''),
+        openingTime: (hospitalInfo as any).openingTime || '08:00',
+        closingTime: (hospitalInfo as any).closingTime || '20:00',
+        totalBeds: String(hospitalInfo.totalBeds || ''),
+        icu_beds_available: String((hospitalInfo as any).icu_beds_available || ''),
+        oxygen_cylinders_available: String((hospitalInfo as any).oxygen_cylinders_available || ''),
+        ambulances_available: String((hospitalInfo as any).ambulances_available || ''),
+        ventilators: String((hospitalInfo as any).ventilators || ''),
+      });
+    }
+  }, [hospitalInfo]);
+
+  const saveProfile = async () => {
+    if (!hospitalInfo?.id) return;
+    setProfileSaving(true);
+    try {
+      await fetch(`${API_URL}/api/hospitals/${hospitalInfo.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: profileForm.name,
+          address: profileForm.address,
+          city: profileForm.city,
+          state: profileForm.state,
+          zipCode: profileForm.zipCode,
+          phone: profileForm.phone,
+          email: profileForm.email,
+          latitude: Number(profileForm.latitude) || undefined,
+          longitude: Number(profileForm.longitude) || undefined,
+          specializations: profileForm.specializations.split(',').map(s => s.trim()).filter(Boolean),
+          openingTime: profileForm.openingTime,
+          closingTime: profileForm.closingTime,
+          totalBeds: Number(profileForm.totalBeds) || 0,
+          icu_beds_available: Number(profileForm.icu_beds_available) || 0,
+          oxygen_cylinders_available: Number(profileForm.oxygen_cylinders_available) || 0,
+          ambulances_available: Number(profileForm.ambulances_available) || 0,
+          ventilators: Number(profileForm.ventilators) || 0,
+        }),
+      });
+      setEditingProfile(false);
+      setProfileSaved(true);
+      setTimeout(() => setProfileSaved(false), 2500);
+    } catch (e) { console.error(e); }
+    setProfileSaving(false);
+  };
+
+  const generateExampleCsv = () => {
+    const headers = 'name,address,city,state,zipCode,phone,email,latitude,longitude,specializations,openingTime,closingTime,totalBeds,icuBedsAvailable,oxygenCylindersAvailable,ambulancesAvailable,ventilators';
+    const values = [
+      profileForm.name || 'My Hospital',
+      profileForm.address || '123 Health Street',
+      profileForm.city || 'New Delhi',
+      profileForm.state || 'Delhi',
+      profileForm.zipCode || '110001',
+      profileForm.phone || '9000000001',
+      profileForm.email || 'admin@myhospital.com',
+      profileForm.latitude || '28.6139',
+      profileForm.longitude || '77.2090',
+      profileForm.specializations || 'Cardiology, Neurology',
+      profileForm.openingTime || '08:00',
+      profileForm.closingTime || '20:00',
+      profileForm.totalBeds || '100',
+      profileForm.icu_beds_available || '10',
+      profileForm.oxygen_cylinders_available || '20',
+      profileForm.ambulances_available || '5',
+      profileForm.ventilators || '8',
+    ].map(v => `"${String(v).replace(/"/g, '""')}"`);
+    return headers + '\n' + values.join(',');
+  };
+
+  const downloadExampleCsv = () => {
+    const csv = generateExampleCsv();
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'hospital_profile_template.csv'; a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleCsvUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setCsvView('uploading');
+    const reader = new FileReader();
+    reader.onload = async (ev) => {
+      try {
+        const text = ev.target?.result as string;
+        const lines = text.trim().split('\n');
+        const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
+        const values = lines[1].split(',').map(v => v.trim().replace(/^"|"$/g, ''));
+        const row: Record<string, string> = {};
+        headers.forEach((h, i) => { row[h] = values[i] || ''; });
+        const updated = {
+          name: row.name || profileForm.name,
+          address: row.address || profileForm.address,
+          city: row.city || profileForm.city,
+          state: row.state || profileForm.state,
+          zipCode: row.zipCode || profileForm.zipCode,
+          phone: row.phone || profileForm.phone,
+          email: row.email || profileForm.email,
+          latitude: row.latitude || profileForm.latitude,
+          longitude: row.longitude || profileForm.longitude,
+          specializations: row.specializations || profileForm.specializations,
+          openingTime: row.openingTime || profileForm.openingTime,
+          closingTime: row.closingTime || profileForm.closingTime,
+          totalBeds: row.totalBeds || profileForm.totalBeds,
+          icu_beds_available: row.icuBedsAvailable || profileForm.icu_beds_available,
+          oxygen_cylinders_available: row.oxygenCylindersAvailable || profileForm.oxygen_cylinders_available,
+          ambulances_available: row.ambulancesAvailable || profileForm.ambulances_available,
+          ventilators: row.ventilators || profileForm.ventilators,
+        };
+        setProfileForm(updated);
+        // Auto-save after 500ms to give the feel of 'instant' update
+        setTimeout(async () => {
+          if (hospitalInfo?.id) {
+            await fetch(`${API_URL}/api/hospitals/${hospitalInfo.id}`, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                name: updated.name, address: updated.address, city: updated.city,
+                state: updated.state, zipCode: updated.zipCode, phone: updated.phone,
+                email: updated.email, latitude: Number(updated.latitude) || undefined,
+                longitude: Number(updated.longitude) || undefined,
+                specializations: updated.specializations.split(',').map((s: string) => s.trim()).filter(Boolean),
+                openingTime: updated.openingTime, closingTime: updated.closingTime,
+                totalBeds: Number(updated.totalBeds) || 0,
+                icu_beds_available: Number(updated.icu_beds_available) || 0,
+                oxygen_cylinders_available: Number(updated.oxygen_cylinders_available) || 0,
+                ambulances_available: Number(updated.ambulances_available) || 0,
+                ventilators: Number(updated.ventilators) || 0,
+              }),
+            });
+          }
+          setCsvView('done');
+          setTimeout(() => setCsvView('none'), 3000);
+        }, 500);
+      } catch (err) {
+        console.error('CSV parse error:', err);
+        setCsvView('none');
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+  };
+
   // Action handlers
   const handleRequestAction = async (id: string, type: 'emergency' | 'bed' | 'appointment', action: 'accept' | 'reject') => {
     const status = action === 'accept' ? (type === 'appointment' ? 'confirmed' : 'assigned') : 'cancelled';
@@ -242,7 +499,7 @@ export default function HospitalPortal() {
 
   const handleAmbulanceResponse = async (notifId: string, action: 'accepted' | 'rejected') => {
     try {
-      await fetch(`${API_URL}/api/webhooks/hospital/${hospitalInfo.id}/ambulance-response`, {
+      await fetch(`${API_URL}/api/webhooks/hospital/${hospitalInfo?.id}/ambulance-response`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ notification_id: notifId, status: action, response_message: action === 'accepted' ? 'Hospital ready for patient' : 'Cannot accommodate at this time' }),
       });
@@ -261,6 +518,7 @@ export default function HospitalPortal() {
     { name: 'Requests', icon: <FileText className="w-5 h-5" />, badge: pendingEmergencies + pendingAppointments },
     { name: 'Inventory', icon: <Package className="w-5 h-5" /> },
     { name: 'Ambulance Alerts', icon: <Car className="w-5 h-5" />, badge: pendingAmbulance },
+    { name: 'Resource Sharing', icon: <ArrowLeftRight className="w-5 h-5" />, badge: incomingRequests.filter(r => r.status === 'pending').length },
   ];
 
   const updateInventoryField = (field: string, delta: number) => {
@@ -385,6 +643,14 @@ export default function HospitalPortal() {
             )}
             <button onClick={fetchData} className="p-2 rounded-lg bg-teal-900/30 border border-teal-800/30 text-teal-400 hover:text-white hover:bg-teal-800/40 transition-all">
               <RefreshCw className="w-4 h-4" />
+            </button>
+            {/* Profile Icon */}
+            <button
+              onClick={() => setProfilePanelOpen(true)}
+              title="Hospital Profile"
+              className="p-2 rounded-lg bg-teal-900/30 border border-teal-800/30 text-teal-400 hover:text-white hover:bg-teal-800/40 transition-all"
+            >
+              <UserCircle2 className="w-5 h-5" />
             </button>
           </div>
         </header>
@@ -561,7 +827,7 @@ export default function HospitalPortal() {
                 </div>
               )}
             </div>
-          ) : (
+          ) : activeTab === 'Ambulance Alerts' ? (
             /* ── Ambulance Alerts Tab ── */
             <div className="space-y-4">
               <div className="flex items-center justify-between mb-2">
@@ -584,9 +850,415 @@ export default function HospitalPortal() {
                 </div>
               )}
             </div>
+          ) : (
+            /* ── Resource Sharing Tab ── */
+            <div className="space-y-4">
+              {/* Sub-nav */}
+              <div className="flex items-center gap-2 mb-4">
+                {(['browse', 'incoming', 'outgoing'] as const).map(v => (
+                  <button key={v} onClick={() => setSharingView(v)}
+                    className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all ${
+                      sharingView === v ? 'bg-teal-600 text-white shadow-lg' : 'bg-teal-900/30 text-teal-400 hover:bg-teal-900/60 border border-teal-800/40'
+                    }`}>
+                    {v === 'browse' ? <><Share2 className="w-3.5 h-3.5" />Browse</> :
+                     v === 'incoming' ? <><Inbox className="w-3.5 h-3.5" />Incoming {incomingRequests.filter(r => r.status === 'pending').length > 0 && <span className="ml-1 bg-rose-500 text-white rounded-full text-[9px] px-1.5">{incomingRequests.filter(r => r.status === 'pending').length}</span>}</> :
+                     <><Send className="w-3.5 h-3.5" />Outgoing</>}
+                  </button>
+                ))}
+              </div>
+
+              {/* BROWSE VIEW */}
+              {sharingView === 'browse' && (
+                <div className="space-y-3">
+                  <p className="text-xs text-teal-400/70 mb-3">Select a hospital to request resources from them. Only hospitals with available units are shown as requestable.</p>
+                  {allHospitals.map(h => (
+                    <div key={h.id} className="bg-[#0a2822] border border-teal-800/30 rounded-xl p-4 hover:border-teal-600/40 transition-all">
+                      <div className="flex items-start justify-between mb-3">
+                        <div>
+                          <h3 className="font-bold text-white text-sm">{h.name}</h3>
+                          <p className="text-teal-500/60 text-xs mt-0.5">{h.city}</p>
+                        </div>
+                        <button
+                          onClick={() => { setRequestModal({ open: true, hospital: h }); setRequestForm({ resourceType: 'oxygen', quantity: '10', message: '' }); }}
+                          className="px-3 py-1.5 bg-teal-600 hover:bg-teal-500 text-white text-xs font-bold rounded-lg transition-all flex items-center gap-1"
+                        >
+                          <Send className="w-3 h-3" /> Request
+                        </button>
+                      </div>
+                      <div className="grid grid-cols-3 gap-2">
+                        {[
+                          { label: 'ICU Beds', val: h.icu_beds_available, color: h.icu_beds_available > 0 ? 'text-teal-300' : 'text-rose-400' },
+                          { label: 'O₂ Cylinders', val: h.oxygen_cylinders_available, color: h.oxygen_cylinders_available > 0 ? 'text-teal-300' : 'text-rose-400' },
+                          { label: 'Ambulances', val: h.ambulances_available, color: h.ambulances_available > 0 ? 'text-teal-300' : 'text-rose-400' },
+                          { label: 'Gen. Beds', val: h.totalBeds, color: h.totalBeds > 0 ? 'text-teal-300' : 'text-rose-400' },
+                          { label: 'Ventilators', val: h.ventilators, color: h.ventilators > 0 ? 'text-teal-300' : 'text-rose-400' },
+                        ].map(stat => (
+                          <div key={stat.label} className="bg-[#071e1a] rounded-lg p-2 border border-teal-900/30 text-center">
+                            <div className={`font-extrabold text-base ${stat.color}`}>{stat.val ?? 0}</div>
+                            <div className="text-[9px] text-teal-500/50 uppercase tracking-wider mt-0.5">{stat.label}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                  {allHospitals.length === 0 && <div className="text-center py-12 text-teal-500/40"><Building2 className="w-12 h-12 mx-auto mb-3 opacity-20" /><p>No other hospitals in system</p></div>}
+                </div>
+              )}
+
+              {/* INCOMING VIEW */}
+              {sharingView === 'incoming' && (
+                <div className="space-y-3">
+                  {incomingRequests.map(req => (
+                    <div key={req.id} className={`border rounded-xl p-4 transition-all ${
+                      req.status === 'pending' ? 'bg-gradient-to-r from-amber-950/20 to-[#0a2822] border-amber-700/40' :
+                      req.status === 'agreed' ? 'bg-[#0a2822] border-emerald-800/30' : 'bg-[#0a2822] border-rose-900/30'
+                    }`}>
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="font-bold text-white text-sm">{req.fromHospitalName}</span>
+                            <span className={`text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${
+                              req.status === 'pending' ? 'text-amber-400 bg-amber-950/50 border border-amber-800/40' :
+                              req.status === 'agreed' ? 'text-emerald-400 bg-emerald-950/40 border border-emerald-800/40' :
+                              'text-rose-400 bg-rose-950/40 border border-rose-800/40'
+                            }`}>{req.status}</span>
+                          </div>
+                          <p className="text-teal-300 text-xs font-semibold">Requesting: <span className="text-white">{req.quantity} × {RESOURCE_LABELS[req.resourceType] || req.resourceType}</span></p>
+                          {req.message && <p className="text-teal-400/70 text-xs mt-1 italic">"{req.message}"</p>}
+                          {req.responseMessage && <p className="text-teal-300/60 text-xs mt-1">Your reply: <span className="italic">"{req.responseMessage}"</span></p>}
+                          <p className="text-teal-500/40 text-[10px] mt-2">{new Date(req.createdAt).toLocaleString()}</p>
+                        </div>
+                        {req.status === 'pending' && (
+                          <button onClick={() => { setRespondModal({ open: true, req }); setRespondNote(''); }}
+                            className="ml-3 shrink-0 px-3 py-1.5 bg-teal-700 hover:bg-teal-600 text-white text-xs font-bold rounded-lg transition-all">
+                            Respond
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                  {incomingRequests.length === 0 && <div className="text-center py-12 text-teal-500/40"><Inbox className="w-12 h-12 mx-auto mb-3 opacity-20" /><p>No incoming resource requests</p></div>}
+                </div>
+              )}
+
+              {/* OUTGOING VIEW */}
+              {sharingView === 'outgoing' && (
+                <div className="space-y-3">
+                  {outgoingRequests.map(req => (
+                    <div key={req.id} className={`border rounded-xl p-4 transition-all ${
+                      req.status === 'pending' ? 'bg-[#0a2822] border-teal-800/30' :
+                      req.status === 'agreed' ? 'bg-gradient-to-r from-emerald-950/20 to-[#0a2822] border-emerald-800/40' :
+                      'bg-gradient-to-r from-rose-950/10 to-[#0a2822] border-rose-900/30'
+                    }`}>
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="font-bold text-white text-sm">{req.toHospitalName}</span>
+                        <span className={`text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${
+                          req.status === 'pending' ? 'text-amber-400 bg-amber-950/50 border border-amber-800/40 animate-pulse' :
+                          req.status === 'agreed' ? 'text-emerald-400 bg-emerald-950/40 border border-emerald-800/40' :
+                          'text-rose-400 bg-rose-950/40 border border-rose-800/40'
+                        }`}>{req.status === 'pending' ? '⏳ Awaiting' : req.status === 'agreed' ? '✅ Agreed' : '❌ Denied'}</span>
+                      </div>
+                      <p className="text-teal-300 text-xs font-semibold">Requested: <span className="text-white">{req.quantity} × {RESOURCE_LABELS[req.resourceType] || req.resourceType}</span></p>
+                      {req.message && <p className="text-teal-400/70 text-xs mt-1 italic">Your note: "{req.message}"</p>}
+                      {req.responseMessage && (
+                        <div className={`mt-2 p-2 rounded-lg border text-xs ${
+                          req.status === 'agreed' ? 'bg-emerald-950/30 border-emerald-800/40 text-emerald-300' : 'bg-rose-950/20 border-rose-900/30 text-rose-300'
+                        }`}>
+                          <span className="font-bold uppercase tracking-wider text-[9px] opacity-70">Their response: </span>"{req.responseMessage}"
+                        </div>
+                      )}
+                      <p className="text-teal-500/40 text-[10px] mt-2">{new Date(req.createdAt).toLocaleString()}</p>
+                    </div>
+                  ))}
+                  {outgoingRequests.length === 0 && <div className="text-center py-12 text-teal-500/40"><Send className="w-12 h-12 mx-auto mb-3 opacity-20" /><p>No outgoing requests yet</p><p className="text-xs mt-1">Go to Browse to request resources from another hospital</p></div>}
+                </div>
+              )}
+
+              {/* Send Request Modal */}
+              {requestModal.open && requestModal.hospital && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#071e1a]/90 backdrop-blur-sm p-4">
+                  <div className="bg-[#0c2e28] border border-teal-700/50 rounded-2xl w-full max-w-md shadow-2xl">
+                    <div className="p-5 border-b border-teal-800/40 flex items-center justify-between">
+                      <h3 className="text-white font-bold">Request Resources</h3>
+                      <button onClick={() => setRequestModal({ open: false, hospital: null })} className="text-teal-400 hover:text-white"><X className="w-5 h-5" /></button>
+                    </div>
+                    <div className="p-5 space-y-4">
+                      <div className="bg-teal-900/20 rounded-lg p-3 border border-teal-800/30">
+                        <p className="text-teal-400/60 text-[10px] uppercase tracking-wider">Requesting from</p>
+                        <p className="text-white font-bold">{requestModal.hospital.name}</p>
+                      </div>
+                      <div>
+                        <label className="block text-teal-200 text-xs font-bold uppercase tracking-wider mb-2">Resource Type</label>
+                        <select value={requestForm.resourceType} onChange={e => setRequestForm(p => ({ ...p, resourceType: e.target.value }))}
+                          className="w-full bg-[#071e1a] border border-teal-800/50 rounded-lg px-4 py-2.5 text-white focus:border-teal-500 outline-none">
+                          {Object.entries(RESOURCE_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-teal-200 text-xs font-bold uppercase tracking-wider mb-2">Quantity Needed</label>
+                        <input type="number" min="1" value={requestForm.quantity} onChange={e => setRequestForm(p => ({ ...p, quantity: e.target.value }))}
+                          className="w-full bg-[#071e1a] border border-teal-800/50 rounded-lg px-4 py-2.5 text-white focus:border-teal-500 outline-none" />
+                      </div>
+                      <div>
+                        <label className="block text-teal-200 text-xs font-bold uppercase tracking-wider mb-2">Note / Reason (optional)</label>
+                        <textarea value={requestForm.message} onChange={e => setRequestForm(p => ({ ...p, message: e.target.value }))} rows={3} placeholder="e.g. Critical patient needs oxygen immediately"
+                          className="w-full bg-[#071e1a] border border-teal-800/50 rounded-lg px-4 py-2.5 text-white focus:border-teal-500 outline-none resize-none placeholder:text-teal-700" />
+                      </div>
+                      <button onClick={sendResourceRequest} disabled={sharingLoading}
+                        className="w-full py-3 bg-teal-600 hover:bg-teal-500 disabled:opacity-50 text-white font-bold rounded-xl transition-all flex items-center justify-center gap-2">
+                        {sharingLoading ? 'Sending...' : <><Send className="w-4 h-4" /> Send Request</>}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Respond Modal */}
+              {respondModal.open && respondModal.req && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#071e1a]/90 backdrop-blur-sm p-4">
+                  <div className="bg-[#0c2e28] border border-teal-700/50 rounded-2xl w-full max-w-md shadow-2xl">
+                    <div className="p-5 border-b border-teal-800/40 flex items-center justify-between">
+                      <h3 className="text-white font-bold">Respond to Request</h3>
+                      <button onClick={() => setRespondModal({ open: false, req: null })} className="text-teal-400 hover:text-white"><X className="w-5 h-5" /></button>
+                    </div>
+                    <div className="p-5 space-y-4">
+                      <div className="bg-teal-900/20 rounded-lg p-3 border border-teal-800/30">
+                        <p className="text-teal-400/60 text-[10px] uppercase tracking-wider">From</p>
+                        <p className="text-white font-bold">{respondModal.req.fromHospitalName}</p>
+                        <p className="text-teal-300 text-sm mt-1">Needs: <strong>{respondModal.req.quantity} × {RESOURCE_LABELS[respondModal.req.resourceType] || respondModal.req.resourceType}</strong></p>
+                        {respondModal.req.message && <p className="text-teal-400/70 text-xs italic mt-1">"{respondModal.req.message}"</p>}
+                      </div>
+                      <div>
+                        <label className="block text-teal-200 text-xs font-bold uppercase tracking-wider mb-2">Your Message / Reason</label>
+                        <textarea value={respondNote} onChange={e => setRespondNote(e.target.value)} rows={3} placeholder="e.g. We can provide 5 cylinders by tomorrow morning"
+                          className="w-full bg-[#071e1a] border border-teal-800/50 rounded-lg px-4 py-2.5 text-white focus:border-teal-500 outline-none resize-none placeholder:text-teal-700" />
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <button onClick={() => respondToRequest('agreed')} disabled={sharingLoading}
+                          className="py-3 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white font-bold rounded-xl transition-all flex items-center justify-center gap-2">
+                          <CheckCircle className="w-4 h-4" /> Agree
+                        </button>
+                        <button onClick={() => respondToRequest('denied')} disabled={sharingLoading}
+                          className="py-3 bg-rose-700 hover:bg-rose-600 disabled:opacity-50 text-white font-bold rounded-xl transition-all flex items-center justify-center gap-2">
+                          <XCircle className="w-4 h-4" /> Deny
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
           )}
         </main>
       </div>
+
+      {/* ─── Hospital Profile Slide-Over Panel ────────────────────────────────── */}
+      {profilePanelOpen && (
+        <div className="fixed inset-0 z-[200] flex justify-end">
+          {/* Backdrop */}
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => { setProfilePanelOpen(false); setEditingProfile(false); setCsvView('none'); }} />
+          {/* Panel */}
+          <div className="relative w-full max-w-lg bg-[#071e1a] border-l border-teal-800/50 h-full overflow-y-auto shadow-2xl flex flex-col">
+            {/* Panel Header */}
+            <div className="sticky top-0 z-10 bg-[#0a2822]/95 backdrop-blur-sm border-b border-teal-800/40 px-6 py-4 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-full bg-teal-900/60 border border-teal-700/40 flex items-center justify-center">
+                  <UserCircle2 className="w-5 h-5 text-teal-400" />
+                </div>
+                <div>
+                  <h2 className="text-white font-bold text-base">Hospital Profile</h2>
+                  <p className="text-teal-500/60 text-[10px] uppercase tracking-wider">Manage your hospital information</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                {!editingProfile && (
+                  <button onClick={() => setEditingProfile(true)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-teal-900/40 hover:bg-teal-800/60 border border-teal-700/40 text-teal-300 rounded-lg text-xs font-bold transition-all">
+                    <Pencil className="w-3.5 h-3.5" /> Edit
+                  </button>
+                )}
+                <button onClick={() => { setProfilePanelOpen(false); setEditingProfile(false); setCsvView('none'); }}
+                  className="w-8 h-8 rounded-full bg-teal-900/40 hover:bg-rose-900/50 border border-teal-700/30 flex items-center justify-center text-teal-400 hover:text-white transition-all">
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+            <div className="flex-1 p-6 space-y-6">
+
+              {/* CSV Upload Section */}
+              <div className="bg-gradient-to-br from-teal-950/40 to-[#041512] border border-teal-800/40 rounded-xl p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <FileSpreadsheet className="w-4 h-4 text-teal-400" />
+                  <h3 className="text-white font-bold text-sm">Bulk Import via CSV</h3>
+                </div>
+                <p className="text-teal-400/70 text-xs mb-4">Download the template pre-filled with your current data, update it, and re-upload to apply all changes instantly.</p>
+
+                {csvView === 'done' ? (
+                  <div className="flex items-center gap-2 px-4 py-3 bg-emerald-950/40 border border-emerald-800/40 rounded-xl text-emerald-400 font-bold text-sm">
+                    <CheckCircle className="w-4 h-4" /> Profile updated from CSV!
+                  </div>
+                ) : csvView === 'uploading' ? (
+                  <div className="flex items-center gap-2 px-4 py-3 bg-teal-950/40 border border-teal-800/40 rounded-xl text-teal-300 text-sm">
+                    <div className="w-4 h-4 border-2 border-t-teal-400 border-teal-800 rounded-full animate-spin" />
+                    Processing CSV...
+                  </div>
+                ) : (
+                  <div className="flex gap-2">
+                    <button onClick={downloadExampleCsv}
+                      className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-teal-900/40 hover:bg-teal-800/50 border border-teal-700/40 text-teal-300 rounded-xl text-xs font-bold transition-all">
+                      <Download className="w-3.5 h-3.5" /> Download Template
+                    </button>
+                    <label className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-teal-600 hover:bg-teal-500 text-white rounded-xl text-xs font-bold cursor-pointer transition-all">
+                      <Upload className="w-3.5 h-3.5" /> Upload CSV
+                      <input type="file" accept=".csv" className="hidden" onChange={handleCsvUpload} />
+                    </label>
+                  </div>
+                )}
+
+                {/* CSV preview table */}
+                <div className="mt-4 rounded-lg overflow-x-auto border border-teal-900/40">
+                  <table className="w-full text-[9px] text-left">
+                    <thead className="bg-teal-950/50">
+                      <tr>{['name','address','city','phone','openingTime','closingTime','totalBeds','icuBeds','oxygen'].map(h => <th key={h} className="px-2 py-1.5 text-teal-500/70 uppercase tracking-wider font-bold whitespace-nowrap">{h}</th>)}</tr>
+                    </thead>
+                    <tbody>
+                      <tr className="border-t border-teal-900/30">
+                        {[profileForm.name, profileForm.address, profileForm.city, profileForm.phone, profileForm.openingTime, profileForm.closingTime, profileForm.totalBeds, profileForm.icu_beds_available, profileForm.oxygen_cylinders_available]
+                          .map((v, i) => <td key={i} className="px-2 py-1.5 text-teal-200/80 whitespace-nowrap max-w-[80px] overflow-hidden text-ellipsis">{v || '—'}</td>)}
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Profile Fields */}
+              {profileSaved && (
+                <div className="flex items-center gap-2 px-4 py-3 bg-emerald-950/40 border border-emerald-800/40 rounded-xl text-emerald-400 font-bold text-sm">
+                  <CheckCircle className="w-4 h-4" /> Profile saved successfully!
+                </div>
+              )}
+
+              {/* Basic Info */}
+              <div className="space-y-3">
+                <h3 className="text-[10px] text-teal-500/60 uppercase tracking-widest font-bold flex items-center gap-2"><Building2 className="w-3.5 h-3.5" />Basic Information</h3>
+                {([
+                  { label: 'Hospital Name', key: 'name', icon: <Building2 className="w-3.5 h-3.5" />, type: 'text' },
+                  { label: 'Phone', key: 'phone', icon: <Phone className="w-3.5 h-3.5" />, type: 'text' },
+                  { label: 'Email', key: 'email', icon: <Mail className="w-3.5 h-3.5" />, type: 'email' },
+                ] as const).map(({ label, key, icon, type }) => (
+                  <div key={key} className="flex items-center gap-3 bg-[#0a2822] border border-teal-800/30 rounded-xl px-4 py-3">
+                    <span className="text-teal-500/60 shrink-0">{icon}</span>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-teal-500/50 text-[9px] uppercase tracking-wider">{label}</p>
+                      {editingProfile
+                        ? <input type={type} value={(profileForm as any)[key]} onChange={e => setProfileForm(p => ({ ...p, [key]: e.target.value }))}
+                            className="w-full bg-transparent text-white text-sm outline-none border-b border-teal-700/40 focus:border-teal-400 mt-0.5 py-0.5" />
+                        : <p className="text-white text-sm font-semibold mt-0.5 truncate">{(profileForm as any)[key] || <span className="text-teal-500/40 italic">Not set</span>}</p>
+                      }
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Address */}
+              <div className="space-y-3">
+                <h3 className="text-[10px] text-teal-500/60 uppercase tracking-widest font-bold flex items-center gap-2"><MapPin className="w-3.5 h-3.5" />Location</h3>
+                {([
+                  { label: 'Address', key: 'address' },
+                  { label: 'City', key: 'city' },
+                  { label: 'State', key: 'state' },
+                  { label: 'Zip Code', key: 'zipCode' },
+                ] as const).map(({ label, key }) => (
+                  <div key={key} className="flex items-center gap-3 bg-[#0a2822] border border-teal-800/30 rounded-xl px-4 py-3">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-teal-500/50 text-[9px] uppercase tracking-wider">{label}</p>
+                      {editingProfile
+                        ? <input value={(profileForm as any)[key]} onChange={e => setProfileForm(p => ({ ...p, [key]: e.target.value }))}
+                            className="w-full bg-transparent text-white text-sm outline-none border-b border-teal-700/40 focus:border-teal-400 mt-0.5 py-0.5" />
+                        : <p className="text-white text-sm font-semibold mt-0.5">{(profileForm as any)[key] || <span className="text-teal-500/40 italic">Not set</span>}</p>
+                      }
+                    </div>
+                  </div>
+                ))}
+                {editingProfile && (
+                  <div className="grid grid-cols-2 gap-2">
+                    {([{ label: 'Latitude', key: 'latitude' }, { label: 'Longitude', key: 'longitude' }] as const).map(({ label, key }) => (
+                      <div key={key} className="bg-[#0a2822] border border-teal-800/30 rounded-xl px-4 py-3">
+                        <p className="text-teal-500/50 text-[9px] uppercase tracking-wider">{label}</p>
+                        <input value={(profileForm as any)[key]} onChange={e => setProfileForm(p => ({ ...p, [key]: e.target.value }))}
+                          className="w-full bg-transparent text-white text-sm outline-none border-b border-teal-700/40 focus:border-teal-400 mt-0.5 py-0.5" />
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Hours & Specializations */}
+              <div className="space-y-3">
+                <h3 className="text-[10px] text-teal-500/60 uppercase tracking-widest font-bold flex items-center gap-2"><Clock className="w-3.5 h-3.5" />Operations</h3>
+                <div className="grid grid-cols-2 gap-2">
+                  {([{ label: 'Opening Time', key: 'openingTime' }, { label: 'Closing Time', key: 'closingTime' }] as const).map(({ label, key }) => (
+                    <div key={key} className="bg-[#0a2822] border border-teal-800/30 rounded-xl px-4 py-3">
+                      <p className="text-teal-500/50 text-[9px] uppercase tracking-wider">{label}</p>
+                      {editingProfile
+                        ? <input type="time" value={(profileForm as any)[key]} onChange={e => setProfileForm(p => ({ ...p, [key]: e.target.value }))}
+                            className="w-full bg-transparent text-white text-sm outline-none border-b border-teal-700/40 focus:border-teal-400 mt-0.5 py-0.5" />
+                        : <p className="text-white text-sm font-bold mt-0.5">{(profileForm as any)[key] || '—'}</p>
+                      }
+                    </div>
+                  ))}
+                </div>
+                <div className="bg-[#0a2822] border border-teal-800/30 rounded-xl px-4 py-3">
+                  <p className="text-teal-500/50 text-[9px] uppercase tracking-wider">Specializations <span className="text-teal-600/60">(comma separated)</span></p>
+                  {editingProfile
+                    ? <input value={profileForm.specializations} onChange={e => setProfileForm(p => ({ ...p, specializations: e.target.value }))}
+                        className="w-full bg-transparent text-white text-sm outline-none border-b border-teal-700/40 focus:border-teal-400 mt-0.5 py-0.5" placeholder="e.g. Cardiology, Neurology" />
+                    : <p className="text-white text-sm mt-0.5">{profileForm.specializations || <span className="text-teal-500/40 italic">Not set</span>}</p>
+                  }
+                </div>
+              </div>
+
+              {/* Resources */}
+              <div className="space-y-3">
+                <h3 className="text-[10px] text-teal-500/60 uppercase tracking-widest font-bold flex items-center gap-2"><Activity className="w-3.5 h-3.5" />Resources</h3>
+                <div className="grid grid-cols-2 gap-2">
+                  {([
+                    { label: 'Total Beds', key: 'totalBeds' },
+                    { label: 'ICU Beds', key: 'icu_beds_available' },
+                    { label: 'Oxygen Cylinders', key: 'oxygen_cylinders_available' },
+                    { label: 'Ambulances', key: 'ambulances_available' },
+                    { label: 'Ventilators', key: 'ventilators' },
+                  ] as const).map(({ label, key }) => (
+                    <div key={key} className="bg-[#0a2822] border border-teal-800/30 rounded-xl px-4 py-3">
+                      <p className="text-teal-500/50 text-[9px] uppercase tracking-wider">{label}</p>
+                      {editingProfile
+                        ? <input type="number" min="0" value={(profileForm as any)[key]} onChange={e => setProfileForm(p => ({ ...p, [key]: e.target.value }))}
+                            className="w-full bg-transparent text-white text-sm outline-none border-b border-teal-700/40 focus:border-teal-400 mt-0.5 py-0.5" />
+                        : <p className="text-white text-lg font-extrabold mt-0.5">{(profileForm as any)[key] || '0'}</p>
+                      }
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Save Button */}
+              {editingProfile && (
+                <div className="flex gap-3 pt-2 pb-6">
+                  <button onClick={() => setEditingProfile(false)}
+                    className="flex-1 py-3 rounded-xl border border-teal-800/40 text-teal-400 hover:bg-teal-900/30 font-bold text-sm transition-all">
+                    Cancel
+                  </button>
+                  <button onClick={saveProfile} disabled={profileSaving}
+                    className="flex-1 py-3 rounded-xl bg-teal-600 hover:bg-teal-500 disabled:opacity-50 text-white font-bold text-sm transition-all flex items-center justify-center gap-2">
+                    {profileSaving ? <><div className="w-4 h-4 border-2 border-t-white border-white/30 rounded-full animate-spin" />Saving...</> : <><Save className="w-4 h-4" />Save Profile</>}
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
