@@ -100,7 +100,7 @@ function DoctorAvatar({ initials, status }: { initials: string; status: 'on-duty
         {initials.slice(0, 2)}
       </div>
       <span
-        className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-[#1b6242] ${
+        className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-[#0a2924] ${
           status === 'on-duty' ? 'bg-emerald-400' : 'bg-gray-500'
         }`}
       />
@@ -129,15 +129,15 @@ function KnowMoreModal({
 
   return (
     <div
-      className="fixed inset-0 z-[9999] flex items-center justify-center bg-[#0f3d2c]/85 backdrop-blur-md p-4"
+      className="fixed inset-0 z-[9999] flex items-center justify-center bg-[#020d0b]/85 backdrop-blur-md p-4"
       onClick={onClose}
     >
       <div
-        className="relative bg-gradient-to-b from-[#1c6845] to-[#175438] border border-teal-700/40 rounded-2xl w-full max-w-3xl max-h-[92vh] overflow-y-auto shadow-[0_0_80px_rgba(20,184,166,0.18)] customized-scrollbar"
+        className="relative bg-gradient-to-b from-[#0b2e28] to-[#071e1a] border border-teal-700/40 rounded-2xl w-full max-w-3xl max-h-[92vh] overflow-y-auto shadow-[0_0_80px_rgba(20,184,166,0.18)] customized-scrollbar"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header */}
-        <div className="sticky top-0 z-10 bg-[#1c6845]/95 backdrop-blur-sm border-b border-teal-800/40 px-6 py-4 flex items-start justify-between">
+        <div className="sticky top-0 z-10 bg-[#0b2e28]/95 backdrop-blur-sm border-b border-teal-800/40 px-6 py-4 flex items-start justify-between">
           <div>
             <div className="flex items-center gap-2 mb-1">
               <span className="text-[10px] font-bold uppercase tracking-widest text-teal-400 bg-teal-900/40 px-2 py-0.5 rounded-full border border-teal-700/40">
@@ -168,7 +168,7 @@ function KnowMoreModal({
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {[
               { label: 'Rating', value: `★ ${hospital.rating}/5`, color: 'text-amber-400', bg: 'bg-amber-950/30 border-amber-800/30' },
-              { label: 'Total Beds', value: hospital.totalBeds.toLocaleString(), color: 'text-teal-300', bg: 'bg-teal-900/30 border-teal-800/30' },
+              { label: 'Total Beds', value: hospital.totalBeds.toLocaleString(), color: 'text-teal-300', bg: 'bg-teal-950/30 border-teal-800/30' },
               { label: 'Est.', value: hospital.established, color: 'text-indigo-300', bg: 'bg-indigo-950/30 border-indigo-800/30' },
               { label: 'Doctors', value: hospital.doctors.length, color: 'text-pink-300', bg: 'bg-pink-950/30 border-pink-800/30' },
             ].map((s) => (
@@ -193,7 +193,7 @@ function KnowMoreModal({
                 { label: 'Ambulances', value: hospital.resources.ambulances, icon: <Car className="w-4 h-4" />, good: hospital.resources.ambulances > 0 },
                 { label: 'Blood', value: hospital.resources.bloodAvailable !== 'None' ? hospital.resources.bloodAvailable : '—', icon: <Droplets className="w-4 h-4" />, good: hospital.resources.bloodAvailable !== 'None' },
               ].map((r) => (
-                <div key={r.label} className={`rounded-xl border p-2.5 flex flex-col items-center gap-1 ${r.good ? 'bg-teal-900/40 border-teal-800/30' : 'bg-rose-950/20 border-rose-900/20'}`}>
+                <div key={r.label} className={`rounded-xl border p-2.5 flex flex-col items-center gap-1 ${r.good ? 'bg-teal-950/40 border-teal-800/30' : 'bg-rose-950/20 border-rose-900/20'}`}>
                   <span className={r.good ? 'text-teal-400' : 'text-rose-400'}>{r.icon}</span>
                   <span className={`text-sm font-extrabold ${r.good ? 'text-teal-200' : 'text-rose-400'}`}>{r.good ? r.value : (typeof r.value === 'number' ? 'NONE' : r.value)}</span>
                   <span className="text-[9px] text-teal-500/60 uppercase tracking-wider text-center">{r.label}</span>
@@ -284,7 +284,7 @@ function KnowMoreModal({
 // ─── Doctor Card (used inside Know More modal) ───────────────────────────────
 function DoctorCard({ doc }: { doc: Doctor }) {
   return (
-    <div className={`flex items-center gap-3 bg-[#175a3d] border rounded-xl p-3 transition-all ${doc.status === 'on-duty' ? 'border-emerald-800/30' : 'border-gray-800/40'}`}>
+    <div className={`flex items-center gap-3 bg-[#08211d] border rounded-xl p-3 transition-all ${doc.status === 'on-duty' ? 'border-emerald-800/30' : 'border-gray-800/40'}`}>
       <DoctorAvatar initials={doc.avatarInitials} status={doc.status} />
       <div className="min-w-0 flex-1">
         <p className="text-white text-sm font-bold leading-tight truncate">{doc.name}</p>
@@ -319,7 +319,7 @@ function ExpandedHospitalCard({
   onKnowMore: (h: Hospital) => void;
 }) {
   return (
-    <div className="bg-gradient-to-br from-[#20706e] to-[#1a6040] border border-teal-500/40 rounded-xl p-4 shadow-[0_0_24px_rgba(20,184,166,0.18)] transition-all">
+    <div className="bg-gradient-to-br from-[#0e3530] to-[#0a2822] border border-teal-500/40 rounded-xl p-4 shadow-[0_0_24px_rgba(20,184,166,0.18)] transition-all">
       {/* Header */}
       <div className="flex items-start justify-between mb-3">
         <div className="flex-1 min-w-0">
@@ -358,7 +358,7 @@ function ExpandedHospitalCard({
         <div className="flex items-center gap-1 bg-cyan-950/30 border border-cyan-900/30 text-cyan-300 px-2 py-1 rounded-lg text-xs font-bold">
           <Car className="w-3 h-3" /> ~{hospital.driveTime} min
         </div>
-        <div className="flex items-center gap-1 bg-teal-900/30 border border-teal-900/30 text-teal-300 px-2 py-1 rounded-lg text-xs font-bold ml-auto">
+        <div className="flex items-center gap-1 bg-teal-950/30 border border-teal-900/30 text-teal-300 px-2 py-1 rounded-lg text-xs font-bold ml-auto">
           <Users className="w-3 h-3" /> {hospital.doctors.length} Doctors
         </div>
       </div>
@@ -373,7 +373,7 @@ function ExpandedHospitalCard({
           { label: 'Ambulance', value: hospital.resources.ambulances, good: hospital.resources.ambulances > 0 },
           { label: 'Blood', value: hospital.resources.bloodAvailable !== 'None' ? hospital.resources.bloodAvailable : '—', good: hospital.resources.bloodAvailable !== 'None' },
         ].map((r) => (
-          <div key={r.label} className={`rounded-lg p-1.5 flex items-center justify-between border ${r.good ? 'bg-[#134832] border-teal-900/30' : 'bg-rose-950/10 border-rose-900/20'}`}>
+          <div key={r.label} className={`rounded-lg p-1.5 flex items-center justify-between border ${r.good ? 'bg-[#041512] border-teal-900/30' : 'bg-rose-950/10 border-rose-900/20'}`}>
             <span className="text-[9px] text-teal-500/70 uppercase tracking-wider font-bold">{r.label}</span>
             <span className={`text-[10px] font-extrabold ${r.good ? 'text-teal-300' : 'text-rose-400'}`}>
               {r.good ? r.value : (typeof r.value === 'number' ? 'NONE' : r.value)}
@@ -462,7 +462,7 @@ function CollapsedHospitalCard({
   return (
     <div
       onClick={onClick}
-      className={`bg-gradient-to-br from-[#1f704a] to-[#185b3e] border ${isSelected ? 'border-rose-500 shadow-[0_0_15px_rgba(244,63,94,0.2)]' : 'border-teal-800/40 hover:border-teal-500/60'} rounded-xl p-4 shadow-lg transition-all cursor-pointer group`}
+      className={`bg-gradient-to-br from-[#0c322c] to-[#08221d] border ${isSelected ? 'border-rose-500 shadow-[0_0_15px_rgba(244,63,94,0.2)]' : 'border-teal-800/40 hover:border-teal-500/60'} rounded-xl p-4 shadow-lg transition-all cursor-pointer group`}
     >
       <div className="flex justify-between items-start mb-3">
         <h3 className="text-base font-extrabold text-[#E2F1E7] group-hover:text-teal-200 transition-colors line-clamp-1">{hospital.name}</h3>
@@ -480,38 +480,38 @@ function CollapsedHospitalCard({
       </div>
 
       <div className="grid grid-cols-2 gap-y-2 gap-x-2 text-[10px] font-bold mb-4">
-        <div className="bg-[#134832] rounded p-1.5 flex items-center justify-between border border-teal-900/30 shadow-inner">
+        <div className="bg-[#041512] rounded p-1.5 flex items-center justify-between border border-teal-900/30 shadow-inner">
           <span className="text-teal-500/70 tracking-wider">ICU BEDS</span>
           <span className={`text-xs ${hospital.resources.icuBeds > 0 ? "text-teal-400" : "text-rose-400"}`}>{hospital.resources.icuBeds > 0 ? hospital.resources.icuBeds : "FULL"}</span>
         </div>
-        <div className="bg-[#134832] rounded p-1.5 flex items-center justify-between border border-teal-900/30 shadow-inner">
+        <div className="bg-[#041512] rounded p-1.5 flex items-center justify-between border border-teal-900/30 shadow-inner">
           <span className="text-teal-500/70 tracking-wider">OXYGEN</span>
           <span className={`text-xs ${hospital.resources.oxygenCylinders > 0 ? "text-teal-400" : "text-rose-400"}`}>{hospital.resources.oxygenCylinders > 0 ? hospital.resources.oxygenCylinders : "OUT"}</span>
         </div>
-        <div className="bg-[#134832] rounded p-1.5 flex items-center justify-between border border-teal-900/30 shadow-inner">
+        <div className="bg-[#041512] rounded p-1.5 flex items-center justify-between border border-teal-900/30 shadow-inner">
           <span className="text-teal-500/70 tracking-wider">BLOOD</span>
           <span className={`text-xs ${hospital.resources.bloodAvailable !== "None" ? "text-rose-400" : "text-red-500/50"}`}>{hospital.resources.bloodAvailable !== "None" ? hospital.resources.bloodAvailable : "NONE"}</span>
         </div>
-        <div className="bg-[#134832] rounded p-1.5 flex items-center justify-between border border-teal-900/30 shadow-inner">
+        <div className="bg-[#041512] rounded p-1.5 flex items-center justify-between border border-teal-900/30 shadow-inner">
           <span className="text-teal-500/70 tracking-wider">AMBULANCE</span>
           <span className={`text-xs ${hospital.resources.ambulances > 0 ? "text-teal-400" : "text-rose-400"}`}>{hospital.resources.ambulances > 0 ? hospital.resources.ambulances : "BUSY"}</span>
         </div>
       </div>
 
       <div className="grid grid-cols-4 gap-2 mt-4">
-        <button onClick={(e) => { e.stopPropagation(); onNavigate(hospital); }} className="flex flex-col items-center justify-center gap-1 p-1.5 rounded-lg bg-[#175438] hover:bg-teal-700 border border-teal-800/40 hover:border-teal-500/40 transition-all text-teal-300">
+        <button onClick={(e) => { e.stopPropagation(); onNavigate(hospital); }} className="flex flex-col items-center justify-center gap-1 p-1.5 rounded-lg bg-[#071E1A] hover:bg-teal-900 border border-teal-800/40 hover:border-teal-500/40 transition-all text-teal-300">
           <Navigation className="w-3.5 h-3.5 hover:text-white" />
           <span className="text-[9px] font-bold uppercase tracking-wider">Nav</span>
         </button>
-        <button onClick={(e) => { e.stopPropagation(); onCall(hospital); }} className="flex flex-col items-center justify-center gap-1 p-1.5 rounded-lg bg-[#175438] hover:bg-teal-700 border border-teal-800/40 hover:border-teal-500/40 transition-all text-teal-300">
+        <button onClick={(e) => { e.stopPropagation(); onCall(hospital); }} className="flex flex-col items-center justify-center gap-1 p-1.5 rounded-lg bg-[#071E1A] hover:bg-teal-900 border border-teal-800/40 hover:border-teal-500/40 transition-all text-teal-300">
           <Phone className="w-3.5 h-3.5 hover:text-white" />
           <span className="text-[9px] font-bold uppercase tracking-wider">Call</span>
         </button>
-        <button onClick={(e) => { e.stopPropagation(); onBook('Appt', hospital); }} className="flex flex-col items-center justify-center gap-1 p-1.5 rounded-lg bg-[#175438] hover:bg-teal-700 border border-teal-800/40 hover:border-teal-500/40 transition-all text-teal-300">
+        <button onClick={(e) => { e.stopPropagation(); onBook('Appt', hospital); }} className="flex flex-col items-center justify-center gap-1 p-1.5 rounded-lg bg-[#071E1A] hover:bg-teal-900 border border-teal-800/40 hover:border-teal-500/40 transition-all text-teal-300">
           <CalendarCheck className="w-3.5 h-3.5 hover:text-white" />
           <span className="text-[9px] font-bold uppercase tracking-wider">Appt</span>
         </button>
-        <button onClick={(e) => { e.stopPropagation(); onBook('Bed', hospital); }} className="flex flex-col items-center justify-center gap-1 p-1.5 rounded-lg bg-teal-900/40 hover:bg-emerald-900/40 border border-emerald-900/30 hover:border-emerald-500/50 transition-all text-emerald-400 relative overflow-hidden">
+        <button onClick={(e) => { e.stopPropagation(); onBook('Bed', hospital); }} className="flex flex-col items-center justify-center gap-1 p-1.5 rounded-lg bg-teal-950/40 hover:bg-emerald-900/40 border border-emerald-900/30 hover:border-emerald-500/50 transition-all text-emerald-400 relative overflow-hidden">
           <BedDouble className="w-3.5 h-3.5" />
           <span className="text-[9px] font-bold uppercase tracking-wider">Bed</span>
         </button>
@@ -853,9 +853,9 @@ export default function PublicPortal() {
   };
 
   return (
-    <div className="h-screen overflow-hidden bg-[#175438] text-gray-100 flex flex-col font-sans">
+    <div className="h-screen overflow-hidden bg-[#071E1A] text-gray-100 flex flex-col font-sans">
       {/* Top Navbar */}
-      <nav className="flex items-center justify-between px-4 py-2.5 bg-[#1b6242] border-b border-teal-900/50 shadow-md">
+      <nav className="flex items-center justify-between px-4 py-2.5 bg-[#0A2924] border-b border-teal-900/50 shadow-md">
         <div className="flex items-center gap-3">
           <div className="bg-pink-500/20 p-1.5 rounded-lg">
             <Building2 className="text-pink-400 w-5 h-5" />
@@ -898,7 +898,7 @@ export default function PublicPortal() {
         {/* Left: Map */}
         <div className="w-full lg:w-[65%] flex flex-col gap-4 h-full min-h-0 overflow-hidden">
           {/* Header Banner */}
-          <div className="flex items-center justify-between bg-[#1f704a] p-4 rounded-xl border border-teal-800/40 shadow-xl relative overflow-hidden">
+          <div className="flex items-center justify-between bg-[#0C322C] p-4 rounded-xl border border-teal-800/40 shadow-xl relative overflow-hidden">
             <div className="absolute top-0 left-0 w-48 h-48 bg-teal-500/5 blur-[80px] rounded-full pointer-events-none"></div>
             <div className="z-10">
               <h1 className="text-2xl font-extrabold text-white mb-1">Public Portal</h1>
@@ -930,9 +930,9 @@ export default function PublicPortal() {
           </div>
 
           {/* Map */}
-          <div className="flex-1 min-h-0 rounded-xl border border-teal-800/40 relative shadow-2xl bg-[#196040] overflow-hidden">
+          <div className="flex-1 min-h-0 rounded-xl border border-teal-800/40 relative shadow-2xl bg-[#09221E] overflow-hidden">
             {locating ? (
-              <div className="absolute inset-0 z-50 bg-[#1f704a]/90 backdrop-blur-md flex flex-col items-center justify-center text-teal-300">
+              <div className="absolute inset-0 z-50 bg-[#0C322C]/90 backdrop-blur-md flex flex-col items-center justify-center text-teal-300">
                 <Crosshair className="w-10 h-10 mb-4 animate-spin-slow" />
                 <h2 className="text-xl font-bold text-white mb-2">Acquiring GPS Location...</h2>
                 <p className="text-sm">For accurate emergency dispatch route calculation.</p>
@@ -994,7 +994,7 @@ export default function PublicPortal() {
               </div>
             )}
 
-            <div className="absolute bottom-4 right-4 px-3 py-1.5 bg-[#175438]/90 backdrop-blur-sm text-xs font-semibold text-teal-400/80 rounded-full shadow border border-teal-800/50 z-[1000] drop-shadow-xl">
+            <div className="absolute bottom-4 right-4 px-3 py-1.5 bg-[#071E1A]/90 backdrop-blur-sm text-xs font-semibold text-teal-400/80 rounded-full shadow border border-teal-800/50 z-[1000] drop-shadow-xl">
               Live Map Area Active
             </div>
           </div>
@@ -1025,7 +1025,7 @@ export default function PublicPortal() {
               placeholder="Search hospitals..." 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-[#1f704a] border border-teal-800/40 text-teal-50 px-9 py-2.5 rounded-lg outline-none focus:border-teal-500/60 focus:ring-1 focus:ring-teal-500/60 transition-all placeholder:text-teal-600 shadow-inner text-sm"
+              className="w-full bg-[#0C322C] border border-teal-800/40 text-teal-50 px-9 py-2.5 rounded-lg outline-none focus:border-teal-500/60 focus:ring-1 focus:ring-teal-500/60 transition-all placeholder:text-teal-600 shadow-inner text-sm"
             />
           </div>
 
@@ -1060,8 +1060,8 @@ export default function PublicPortal() {
 
       {/* SOS Modal */}
       {sosModalOpen && (
-        <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-[#175438]/90 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-          <div className="bg-gradient-to-br from-rose-950 to-[#165040] border border-rose-800 shadow-2xl rounded-2xl w-full max-w-lg overflow-hidden shadow-[0_0_50px_rgba(225,29,72,0.2)]">
+        <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-[#071E1A]/90 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+          <div className="bg-gradient-to-br from-rose-950 to-[#0A1A17] border border-rose-800 shadow-2xl rounded-2xl w-full max-w-lg overflow-hidden shadow-[0_0_50px_rgba(225,29,72,0.2)]">
             <div className="bg-rose-600 px-6 py-4 flex items-center justify-between">
               <h2 className="text-xl font-extrabold text-white tracking-widest uppercase flex items-center gap-2">
                 <AlertTriangle className="w-5 h-5"/> Emergency SOS
@@ -1134,7 +1134,7 @@ export default function PublicPortal() {
                       type="text" 
                       value={sosForm.name}
                       onChange={e => setSosForm(prev => ({...prev, name: e.target.value}))}
-                      className="w-full bg-[#114030] border border-rose-900/50 rounded-lg px-4 py-3 text-white focus:border-rose-500 focus:outline-none"
+                      className="w-full bg-[#05110E] border border-rose-900/50 rounded-lg px-4 py-3 text-white focus:border-rose-500 focus:outline-none"
                       placeholder="e.g. Rahul Verma"
                     />
                   </div>
@@ -1144,7 +1144,7 @@ export default function PublicPortal() {
                       type="text" 
                       value={sosForm.condition}
                       onChange={e => setSosForm(prev => ({...prev, condition: e.target.value}))}
-                      className="w-full bg-[#114030] border border-rose-900/50 rounded-lg px-4 py-3 text-white focus:border-rose-500 focus:outline-none"
+                      className="w-full bg-[#05110E] border border-rose-900/50 rounded-lg px-4 py-3 text-white focus:border-rose-500 focus:outline-none"
                       placeholder="e.g. Cardiac Arrest, Severe Bleeding"
                     />
                   </div>
@@ -1154,7 +1154,7 @@ export default function PublicPortal() {
                       <select 
                         value={sosForm.severity}
                         onChange={e => setSosForm(prev => ({...prev, severity: e.target.value}))}
-                        className="w-full bg-[#114030] border border-rose-900/50 rounded-lg px-4 py-3 text-white focus:border-rose-500 focus:outline-none appearance-none"
+                        className="w-full bg-[#05110E] border border-rose-900/50 rounded-lg px-4 py-3 text-white focus:border-rose-500 focus:outline-none appearance-none"
                       >
                         <option value="low">Low</option>
                         <option value="moderate">Moderate</option>
@@ -1163,7 +1163,7 @@ export default function PublicPortal() {
                     </div>
                     <div>
                       <label className="block text-rose-200 text-xs font-bold uppercase tracking-wider mb-2">Type</label>
-                      <div className="h-[46px] flex items-center gap-3 bg-[#114030] border border-rose-900/50 rounded-lg px-4">
+                      <div className="h-[46px] flex items-center gap-3 bg-[#05110E] border border-rose-900/50 rounded-lg px-4">
                         <input 
                           type="checkbox" 
                           id="accident"
@@ -1201,7 +1201,7 @@ export default function PublicPortal() {
                   <h3 className="text-2xl font-extrabold text-white mb-2">Ambulance Dispatched!</h3>
                   <p className="text-teal-200 font-medium mb-6">An emergency vehicle is en route to your location.</p>
                   
-                  <div className="bg-[#114030] p-4 rounded-xl border border-teal-900 text-left">
+                  <div className="bg-[#05110E] p-4 rounded-xl border border-teal-900 text-left">
                     <div className="flex items-center gap-3 mb-4 break-all">
                       <div className="bg-teal-900/50 p-2 rounded-lg"><User className="text-teal-400 w-5 h-5"/></div>
                       <div>
@@ -1243,7 +1243,7 @@ export default function PublicPortal() {
                   <h3 className="text-2xl font-extrabold text-white mb-2">🚑 Ambulance Arrived!</h3>
                   <p className="text-emerald-300 font-medium mb-6">Your ambulance is here. Please prepare to be assisted.</p>
                   {sosDriverInfo && (
-                    <div className="bg-[#114030] p-4 rounded-xl border border-emerald-900/60 text-left mb-4">
+                    <div className="bg-[#05110E] p-4 rounded-xl border border-emerald-900/60 text-left mb-4">
                       <div className="text-[10px] text-emerald-500 uppercase tracking-widest font-bold mb-1">Driver</div>
                       <div className="font-bold text-white">{sosDriverInfo.name} · {sosDriverInfo.vehicle}</div>
                       <div className="text-sm text-teal-300 mt-1">{sosDriverInfo.phone}</div>
@@ -1283,8 +1283,8 @@ export default function PublicPortal() {
 
       {/* Booking Modal */}
       {bookingModal.isOpen && bookingModal.hospital && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#175438]/80 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-          <div className="bg-[#1f704a] border border-teal-700/50 shadow-2xl rounded-2xl w-full max-w-md overflow-hidden shadow-[0_0_50px_rgba(20,184,166,0.15)] relative">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#071E1A]/80 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+          <div className="bg-[#0C322C] border border-teal-700/50 shadow-2xl rounded-2xl w-full max-w-md overflow-hidden shadow-[0_0_50px_rgba(20,184,166,0.15)] relative">
             <div className="p-6">
               <div className="flex justify-between items-start mb-6">
                 <h3 className="text-xl font-bold text-white">
@@ -1296,7 +1296,7 @@ export default function PublicPortal() {
                 >×</button>
               </div>
 
-              <div className="bg-[#196040] rounded-xl p-4 mb-6 border border-teal-800/40">
+              <div className="bg-[#09221E] rounded-xl p-4 mb-6 border border-teal-800/40">
                 <p className="text-teal-200 text-sm mb-1">Target Facility</p>
                 <p className="text-white font-semibold flex items-center gap-2">
                   <Building2 className="w-4 h-4 text-teal-400" />
@@ -1332,20 +1332,20 @@ export default function PublicPortal() {
                     placeholder="Full Name *" 
                     value={bookingForm.patientName}
                     onChange={(e) => setBookingForm(prev => ({...prev, patientName: e.target.value}))}
-                    className="w-full bg-[#175438] border border-teal-800/60 rounded-lg px-4 py-2.5 text-white outline-none focus:border-teal-500 placeholder:text-teal-700"
+                    className="w-full bg-[#071E1A] border border-teal-800/60 rounded-lg px-4 py-2.5 text-white outline-none focus:border-teal-500 placeholder:text-teal-700"
                   />
                   <input 
                     type="tel" 
                     placeholder="Phone Number" 
                     value={bookingForm.patientPhone}
                     onChange={(e) => setBookingForm(prev => ({...prev, patientPhone: e.target.value}))}
-                    className="w-full bg-[#175438] border border-teal-800/60 rounded-lg px-4 py-2.5 text-white outline-none focus:border-teal-500 placeholder:text-teal-700"
+                    className="w-full bg-[#071E1A] border border-teal-800/60 rounded-lg px-4 py-2.5 text-white outline-none focus:border-teal-500 placeholder:text-teal-700"
                   />
                   <textarea 
                     placeholder={bookingModal.type === 'Appt' ? 'Reason for visit' : 'Medical condition / notes'}
                     value={bookingForm.reason}
                     onChange={(e) => setBookingForm(prev => ({...prev, reason: e.target.value}))}
-                    className="w-full bg-[#175438] border border-teal-800/60 rounded-lg px-4 py-2.5 text-white outline-none focus:border-teal-500 placeholder:text-teal-700 resize-none h-20"
+                    className="w-full bg-[#071E1A] border border-teal-800/60 rounded-lg px-4 py-2.5 text-white outline-none focus:border-teal-500 placeholder:text-teal-700 resize-none h-20"
                   />
                   
                   <button 
@@ -1380,7 +1380,7 @@ export default function PublicPortal() {
           width: 6px;
         }
         .customized-scrollbar::-webkit-scrollbar-track {
-          background: #1f704a;
+          background: #0C322C;
           border-radius: 8px;
         }
         .customized-scrollbar::-webkit-scrollbar-thumb {

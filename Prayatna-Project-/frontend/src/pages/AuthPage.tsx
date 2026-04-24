@@ -33,7 +33,7 @@ const ROLES = [
     color: 'from-teal-500 to-emerald-500',
     border: 'border-teal-500/50',
     glow: 'shadow-teal-500/20',
-    bg: 'bg-teal-900/30',
+    bg: 'bg-teal-950/30',
   },
   {
     id: 'hospital_admin' as Role,
@@ -76,7 +76,7 @@ function InputField({
           onChange={e => onChange(e.target.value)}
           placeholder={placeholder}
           maxLength={maxLength}
-          className="w-full bg-[#124432] border border-teal-800/40 rounded-xl pl-10 pr-10 py-3 text-white placeholder-teal-700/50 text-sm focus:outline-none focus:border-teal-500/70 focus:ring-1 focus:ring-teal-500/30 transition-all"
+          className="w-full bg-[#051510] border border-teal-800/40 rounded-xl pl-10 pr-10 py-3 text-white placeholder-teal-700/50 text-sm focus:outline-none focus:border-teal-500/70 focus:ring-1 focus:ring-teal-500/30 transition-all"
         />
         {isPass && (
           <button type="button" onClick={() => setShow(s => !s)} className="absolute right-3 top-1/2 -translate-y-1/2 text-teal-600 hover:text-teal-400 transition-colors">
@@ -294,7 +294,7 @@ export default function AuthPage({ onAuth }: { onAuth: (user: any) => void }) {
           onChange={e => set('otp')(e.target.value.replace(/\D/g, ''))}
           maxLength={6}
           placeholder="_ _ _ _ _ _"
-          className="w-full bg-[#124432] border border-teal-800/40 rounded-xl px-4 py-4 text-white text-center text-2xl tracking-[0.5em] font-mono focus:outline-none focus:border-teal-500/70 focus:ring-1 focus:ring-teal-500/30 transition-all"
+          className="w-full bg-[#051510] border border-teal-800/40 rounded-xl px-4 py-4 text-white text-center text-2xl tracking-[0.5em] font-mono focus:outline-none focus:border-teal-500/70 focus:ring-1 focus:ring-teal-500/30 transition-all"
         />
       </div>
 
@@ -357,7 +357,7 @@ export default function AuthPage({ onAuth }: { onAuth: (user: any) => void }) {
           onChange={e => set('otp')(e.target.value.replace(/\D/g, ''))}
           maxLength={6}
           placeholder="_ _ _ _ _ _"
-          className="w-full bg-[#124432] border border-teal-800/40 rounded-xl px-4 py-4 text-white text-center text-2xl tracking-[0.5em] font-mono focus:outline-none focus:border-teal-500/70 focus:ring-1 focus:ring-teal-500/30 transition-all"
+          className="w-full bg-[#051510] border border-teal-800/40 rounded-xl px-4 py-4 text-white text-center text-2xl tracking-[0.5em] font-mono focus:outline-none focus:border-teal-500/70 focus:ring-1 focus:ring-teal-500/30 transition-all"
         />
       </div>
       {error && <p className="text-rose-400 text-xs bg-rose-950/30 border border-rose-800/30 rounded-lg px-3 py-2">{error}</p>}
@@ -391,7 +391,7 @@ export default function AuthPage({ onAuth }: { onAuth: (user: any) => void }) {
   };
 
   return (
-    <div className="min-h-screen bg-[#175438] flex items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-screen bg-[#071E1A] flex items-center justify-center p-4 relative overflow-hidden">
       {/* Background glow */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-32 -left-32 w-96 h-96 bg-teal-500/5 rounded-full blur-3xl" />
@@ -418,7 +418,7 @@ export default function AuthPage({ onAuth }: { onAuth: (user: any) => void }) {
         </div>
 
         {/* Card */}
-        <div className="bg-[#1c6845]/80 backdrop-blur-xl border border-teal-700/30 rounded-3xl shadow-2xl shadow-teal-900/30 overflow-hidden">
+        <div className="bg-[#0b2e28]/80 backdrop-blur-xl border border-teal-700/30 rounded-3xl shadow-2xl shadow-teal-900/30 overflow-hidden">
           {/* Tabs */}
           <div className="flex border-b border-teal-800/40">
             {(['register', 'login'] as const).map(m => (
@@ -435,8 +435,8 @@ export default function AuthPage({ onAuth }: { onAuth: (user: any) => void }) {
               <div className="flex items-center gap-1.5 flex-1">
                 {['role', 'info', 'otp'].map((s, i) => (
                   <React.Fragment key={s}>
-                    <div className={`w-2 h-2 rounded-full transition-all ${step === s ? 'bg-teal-400 scale-125' : ['role', 'info', 'otp'].indexOf(step) > i ? 'bg-teal-500' : 'bg-teal-700'}`} />
-                    {i < 2 && <div className={`flex-1 h-px transition-all ${['role', 'info', 'otp'].indexOf(step) > i ? 'bg-teal-500' : 'bg-teal-700'}`} />}
+                    <div className={`w-2 h-2 rounded-full transition-all ${step === s ? 'bg-teal-400 scale-125' : ['role', 'info', 'otp'].indexOf(step) > i ? 'bg-teal-500' : 'bg-teal-900'}`} />
+                    {i < 2 && <div className={`flex-1 h-px transition-all ${['role', 'info', 'otp'].indexOf(step) > i ? 'bg-teal-500' : 'bg-teal-900'}`} />}
                   </React.Fragment>
                 ))}
               </div>
