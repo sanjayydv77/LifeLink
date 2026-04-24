@@ -4,6 +4,7 @@ import {
   ChevronLeft, Shield, Eye, EyeOff, CheckCircle2, Loader2,
   Ambulance, Stethoscope, Users, ArrowRight, Lock, RefreshCw
 } from 'lucide-react';
+import NeuronCanvas from '../components/NeuronCanvas';
 
 // Inject login page keyframes once
 const LOGIN_STYLE = `
@@ -217,11 +218,11 @@ export default function AuthPage({ onAuth }: { onAuth: (user: any) => void }) {
     setForm({ name: '', email: '', phone: '', otp: '', agencyName: '', vehicleNumber: '', licenseNumber: '', hospitalName: '', hospitalCity: '' });
   };
 
-  // ── Step: Role selection ──
+  // â”€â”€ Step: Role selection â”€â”€
   const renderRoleStep = () => (
     <div className="space-y-4">
       <div className="text-center mb-6">
-        <p className="text-teal-400/70 text-sm">I am registering as a…</p>
+        <p className="text-teal-400/70 text-sm">I am registering as aâ€¦</p>
       </div>
       {ROLES.map(r => (
         <button
@@ -242,7 +243,7 @@ export default function AuthPage({ onAuth }: { onAuth: (user: any) => void }) {
     </div>
   );
 
-  // ── Step: Info form ──
+  // â”€â”€ Step: Info form â”€â”€
   const renderInfoStep = () => (
     <div className="space-y-4">
       <button onClick={() => { setStep('role'); setError(''); }} className="flex items-center gap-2 text-teal-400/70 hover:text-teal-300 text-sm transition-colors mb-2">
@@ -295,7 +296,7 @@ export default function AuthPage({ onAuth }: { onAuth: (user: any) => void }) {
     </div>
   );
 
-  // ── Step: OTP (register) ──
+  // â”€â”€ Step: OTP (register) â”€â”€
   const renderOtpStep = () => (
     <div className="space-y-4">
       <button onClick={() => { setStep('info'); setError(''); }} className="flex items-center gap-2 text-teal-400/70 hover:text-teal-300 text-sm transition-colors">
@@ -309,7 +310,7 @@ export default function AuthPage({ onAuth }: { onAuth: (user: any) => void }) {
         <p className="text-teal-300 font-bold text-lg">+91 {form.phone}</p>
         {devOtp && (
           <p className="text-amber-400 text-xs mt-2 bg-amber-950/30 border border-amber-700/30 rounded-lg px-3 py-1.5">
-            🛠 Dev Mode OTP: <strong>{devOtp}</strong>
+            ðŸ›  Dev Mode OTP: <strong>{devOtp}</strong>
           </p>
         )}
       </div>
@@ -342,7 +343,7 @@ export default function AuthPage({ onAuth }: { onAuth: (user: any) => void }) {
     </div>
   );
 
-  // ── Login Steps ──
+  // â”€â”€ Login Steps â”€â”€
   const renderLoginPhoneStep = () => (
     <div className="space-y-4">
       <div className="text-center mb-2">
@@ -372,7 +373,7 @@ export default function AuthPage({ onAuth }: { onAuth: (user: any) => void }) {
         <p className="text-teal-300 font-bold text-lg">+91 {form.phone}</p>
         {devOtp && (
           <p className="text-amber-400 text-xs mt-2 bg-amber-950/30 border border-amber-700/30 rounded-lg px-3 py-1.5">
-            🛠 Dev Mode OTP: <strong>{devOtp}</strong>
+            ðŸ›  Dev Mode OTP: <strong>{devOtp}</strong>
           </p>
         )}
       </div>
@@ -430,122 +431,103 @@ export default function AuthPage({ onAuth }: { onAuth: (user: any) => void }) {
       const r = cardRef.current.getBoundingClientRect();
       const cx = e.clientX - r.left - r.width/2;
       const cy = e.clientY - r.top - r.height/2;
-      setTilt({x: (cy/r.height)*-10, y: (cx/r.width)*10});
+      setTilt({x:(cy/r.height)*-8, y:(cx/r.width)*8});
     }
   };
   const onMouseLeave = () => setTilt({x:0,y:0});
 
   return (
-    <div
-      className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden"
-      style={{background:'#071E1A', cursor:'default'}}
-      onMouseMove={onMouseMove}
-      onMouseLeave={onMouseLeave}
-    >
-      {/* Mouse spotlight */}
-      <div className="absolute inset-0 pointer-events-none" style={{
-        background:`radial-gradient(600px circle at ${mouse.x}% ${mouse.y}%, rgba(20,184,166,0.07) 0%, transparent 70%)`,
-        transition:'background 0.08s ease',
-      }}/>
+    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden"
+      style={{background:'#041512'}}
+      onMouseMove={onMouseMove} onMouseLeave={onMouseLeave}>
 
-      {/* Animated background orbs */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div style={{position:'absolute',top:`${20+(mouse.y-50)*0.08}%`,left:`${-8+(mouse.x-50)*0.06}%`,width:420,height:420,borderRadius:'50%',background:'radial-gradient(circle,rgba(20,184,166,0.09) 0%,transparent 70%)',filter:'blur(60px)',animation:'llOrb 7s ease-in-out infinite',transition:'top 0.4s,left 0.4s'}}/>
-        <div style={{position:'absolute',bottom:`${10+(mouse.y-50)*-0.07}%`,right:`${-6+(mouse.x-50)*-0.05}%`,width:380,height:380,borderRadius:'50%',background:'radial-gradient(circle,rgba(16,185,129,0.08) 0%,transparent 70%)',filter:'blur(50px)',animation:'llOrb 9s ease-in-out infinite 2s',transition:'bottom 0.4s,right 0.4s'}}/>
-        <div style={{position:'absolute',top:'45%',left:'45%',width:600,height:600,borderRadius:'50%',background:'radial-gradient(circle,rgba(20,184,166,0.04) 0%,transparent 70%)',filter:'blur(80px)',transform:'translate(-50%,-50%)'}}/>
-        {/* Rotating ring */}
-        <div style={{position:'absolute',top:'50%',left:'50%',width:700,height:700,borderRadius:'50%',border:'1px solid rgba(20,184,166,0.04)',transform:'translate(-50%,-50%)',animation:'llSpin 40s linear infinite'}}/>
-        <div style={{position:'absolute',top:'50%',left:'50%',width:500,height:500,borderRadius:'50%',border:'1px solid rgba(20,184,166,0.06)',transform:'translate(-50%,-50%)',animation:'llSpin 28s linear infinite reverse'}}/>
-      </div>
+      {/* Neuron network canvas */}
+      <NeuronCanvas />
 
-      {/* Grid */}
-      <div className="absolute inset-0 pointer-events-none" style={{backgroundImage:'linear-gradient(rgba(20,184,166,1) 1px,transparent 1px),linear-gradient(90deg,rgba(20,184,166,1) 1px,transparent 1px)',backgroundSize:'48px 48px',opacity:0.022}}/>
-
-      {/* Floating particles */}
-      <div className="absolute inset-0 pointer-events-none">
-        {PARTICLES.map((p,i)=>(
-          <div key={i} style={{position:'absolute',left:`${p.x}%`,top:`${p.y}%`,width:p.size,height:p.size,borderRadius:'50%',background:'rgba(45,212,191,1)',opacity:p.opacity,animation:`llFloat2 ${p.dur}s ease-in-out infinite ${p.delay}s`}}/>
-        ))}
-      </div>
-
-      {/* Floating bg icons */}
-      <div className="absolute inset-0 pointer-events-none">
-        {ICONS_BG.map(({Icon,x,y,delay,size},i)=>(
-          <div key={i} style={{position:'absolute',left:`${x}%`,top:`${y}%`,opacity:0.055,color:'#14b8a6',animation:`llFloat2 8s ease-in-out infinite ${delay}`,transform:`translate(-50%,-50%)`}}>
-            <Icon style={{width:size,height:size}}/>
-          </div>
-        ))}
-      </div>
+      {/* Deep radial vignette */}
+      <div className="absolute inset-0 pointer-events-none" style={{background:'radial-gradient(ellipse 80% 80% at 50% 50%, transparent 30%, rgba(4,21,18,0.85) 100%)', zIndex:1}}/>
 
       {/* Content */}
-      <div className="w-full max-w-md relative z-10" style={{animation:'llFadeUp 0.6s ease both'}}>
-        {/* Logo */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-3 mb-3">
-            <div style={{width:52,height:52,borderRadius:16,background:'linear-gradient(135deg,#2dd4bf,#10b981)',display:'flex',alignItems:'center',justifyContent:'center',boxShadow:'0 0 32px rgba(45,212,191,0.4)',position:'relative'}}>
-              <Heart style={{width:24,height:24,color:'white',fill:'white'}}/>
-              <div style={{position:'absolute',inset:0,borderRadius:16,border:'1px solid rgba(45,212,191,0.5)',animation:'llPing 2.5s ease-out infinite'}}/>
+      <div className="w-full max-w-[440px] relative" style={{zIndex:2, animation:'llFadeUp 0.7s ease both'}}>
+
+        {/* Brand */}
+        <div className="text-center mb-7">
+          <div className="inline-flex items-center gap-3">
+            <div style={{width:56,height:56,borderRadius:18,background:'linear-gradient(135deg,#2dd4bf 0%,#059669 100%)',display:'flex',alignItems:'center',justifyContent:'center',boxShadow:'0 0 40px rgba(45,212,191,0.45)',position:'relative'}}>
+              <Heart style={{width:26,height:26,color:'white',fill:'white'}}/>
+              <div style={{position:'absolute',inset:-1,borderRadius:19,background:'linear-gradient(135deg,rgba(45,212,191,0.6),transparent)',zIndex:-1}}/>
             </div>
             <div className="text-left">
-              <h1 className="text-3xl font-extrabold text-white tracking-tight" style={{textShadow:'0 0 40px rgba(45,212,191,0.3)'}}>LifeLink</h1>
-              <p className="text-teal-400/70 text-xs font-semibold tracking-widest uppercase">Emergency Response Network</p>
+              <h1 style={{fontSize:30,fontWeight:900,color:'white',margin:0,letterSpacing:-1,textShadow:'0 0 60px rgba(45,212,191,0.4)'}}>LifeLink</h1>
+              <p style={{fontSize:10,color:'rgba(45,212,191,0.6)',margin:0,fontWeight:700,letterSpacing:3,textTransform:'uppercase'}}>Emergency Response Network</p>
             </div>
           </div>
         </div>
 
-        {/* Card with 3D tilt */}
-        <div
-          ref={cardRef}
-          style={{
-            background:'rgba(11,46,40,0.82)',
-            backdropFilter:'blur(24px)',
-            border:'1px solid rgba(45,212,191,0.18)',
-            borderRadius:28,
-            boxShadow:`0 32px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(45,212,191,0.08), inset 0 1px 0 rgba(45,212,191,0.1)`,
-            overflow:'hidden',
-            transform:`perspective(1000px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) scale(1.01)`,
-            transition:'transform 0.15s ease',
-          }}
-        >
-          {/* Card shine on tilt */}
-          <div style={{position:'absolute',inset:0,background:`radial-gradient(circle at ${50+tilt.y*3}% ${50+tilt.x*-3}%, rgba(45,212,191,0.06) 0%, transparent 60%)`,pointerEvents:'none',zIndex:0,transition:'background 0.15s'}}/>
+        {/* Animated gradient border card */}
+        <div style={{padding:1.5,borderRadius:28,background:'linear-gradient(135deg,rgba(45,212,191,0.5),rgba(16,185,129,0.2),rgba(45,212,191,0.4))',boxShadow:'0 40px 100px rgba(0,0,0,0.6), 0 0 80px rgba(45,212,191,0.08)'}}>
+          <div
+            ref={cardRef}
+            style={{
+              background:'rgba(7,20,17,0.92)',
+              backdropFilter:'blur(32px)',
+              borderRadius:27,
+              overflow:'hidden',
+              transform:`perspective(900px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`,
+              transition:'transform 0.18s ease',
+              position:'relative',
+            }}
+          >
+            {/* Inner shimmer */}
+            <div style={{position:'absolute',inset:0,background:`radial-gradient(circle at ${50+tilt.y*4}% ${50+tilt.x*-4}%, rgba(45,212,191,0.07) 0%, transparent 55%)`,pointerEvents:'none',zIndex:0,transition:'background 0.18s'}}/>
+            {/* Top accent line */}
+            <div style={{height:2,background:'linear-gradient(90deg,transparent,rgba(45,212,191,0.8),rgba(16,185,129,0.8),transparent)',position:'relative',zIndex:1}}/>
 
-          {/* Tabs */}
-          <div className="flex border-b border-teal-800/40" style={{position:'relative',zIndex:1}}>
-            {(['register','login'] as const).map(m=>(
-              <button key={m} onClick={()=>switchMode(m)}
-                className={`flex-1 py-4 text-sm font-bold transition-all ${mode===m?'text-teal-300 border-b-2 border-teal-400':'text-teal-600/60 hover:text-teal-400'}`}
-                style={{background:mode===m?'rgba(20,184,166,0.1)':'transparent'}}>
-                {m==='register'?'Create Account':'Sign In'}
-              </button>
-            ))}
-          </div>
+            {/* Tabs */}
+            <div style={{display:'flex',borderBottom:'1px solid rgba(45,212,191,0.1)',position:'relative',zIndex:1}}>
+              {(['register','login'] as const).map(m=>(
+                <button key={m} onClick={()=>switchMode(m)}
+                  style={{
+                    flex:1,padding:'14px 0',fontSize:13,fontWeight:800,border:'none',cursor:'pointer',transition:'all 0.2s',
+                    color:mode===m?'#2dd4bf':'rgba(45,212,191,0.35)',
+                    background:mode===m?'rgba(45,212,191,0.07)':'transparent',
+                    borderBottom:mode===m?'2px solid #2dd4bf':'2px solid transparent',
+                  }}>
+                  {m==='register'?'Create Account':'Sign In'}
+                </button>
+              ))}
+            </div>
 
-          {/* Step indicator */}
-          <div className="px-6 pt-5 pb-2 flex items-center gap-2" style={{position:'relative',zIndex:1}}>
-            {mode==='register'&&(
-              <div className="flex items-center gap-1.5 flex-1">
-                {['role','info','otp'].map((s,i)=>(
-                  <React.Fragment key={s}>
-                    <div className={`w-2 h-2 rounded-full transition-all ${step===s?'bg-teal-400 scale-125':['role','info','otp'].indexOf(step)>i?'bg-teal-500':'bg-teal-900'}`}/>
-                    {i<2&&<div className={`flex-1 h-px transition-all ${['role','info','otp'].indexOf(step)>i?'bg-teal-500':'bg-teal-900'}`}/>}
-                  </React.Fragment>
-                ))}
-              </div>
-            )}
-            <span className="text-xs font-semibold text-teal-400/60 uppercase tracking-wider ml-auto">{stepLabel()}</span>
-          </div>
+            {/* Step dots */}
+            <div style={{padding:'14px 24px 8px',display:'flex',alignItems:'center',gap:8,position:'relative',zIndex:1}}>
+              {mode==='register'&&(
+                <div style={{display:'flex',alignItems:'center',gap:6,flex:1}}>
+                  {['role','info','otp'].map((s,i)=>(
+                    <React.Fragment key={s}>
+                      <div style={{width:8,height:8,borderRadius:'50%',transition:'all 0.3s',
+                        background:step===s?'#2dd4bf':['role','info','otp'].indexOf(step)>i?'#0d9488':'rgba(45,212,191,0.15)',
+                        boxShadow:step===s?'0 0 10px rgba(45,212,191,0.8)':'none',
+                        transform:step===s?'scale(1.4)':'scale(1)'}}/>
+                      {i<2&&<div style={{flex:1,height:1,background:['role','info','otp'].indexOf(step)>i?'rgba(45,212,191,0.5)':'rgba(45,212,191,0.1)'}}/>}
+                    </React.Fragment>
+                  ))}
+                </div>
+              )}
+              <span style={{fontSize:9,fontWeight:800,color:'rgba(45,212,191,0.4)',textTransform:'uppercase',letterSpacing:2,marginLeft:'auto'}}>{stepLabel()}</span>
+            </div>
 
-          {/* Content */}
-          <div className="px-6 pb-6 pt-2" style={{position:'relative',zIndex:1}}>
-            {stepContent()}
+            {/* Form content */}
+            <div style={{padding:'8px 24px 28px',position:'relative',zIndex:1}}>
+              {stepContent()}
+            </div>
           </div>
         </div>
 
-        <p className="text-center text-teal-700/50 text-xs mt-6">
-          Secured with OTP authentication · LifeLink © 2026
+        <p style={{textAlign:'center',color:'rgba(45,212,191,0.2)',fontSize:11,marginTop:20}}>
+          Secured with OTP &middot; LifeLink &copy; 2026
         </p>
       </div>
     </div>
   );
 }
+
