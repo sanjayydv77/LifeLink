@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import PublicPortal from './pages/PublicPortal';
 import AmbulancePortal from './pages/AmbulancePortal';
@@ -86,11 +86,17 @@ function AppInner() {
   );
 }
 
+function ChatbotWrapper() {
+  const location = useLocation();
+  if (location.pathname.startsWith('/admin')) return null;
+  return <LifeLinkChatbot />;
+}
+
 function App() {
   return (
     <Router>
       <AppInner />
-      <LifeLinkChatbot />
+      <ChatbotWrapper />
     </Router>
   );
 }
