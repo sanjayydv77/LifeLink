@@ -1,18 +1,25 @@
 import { useEffect, useRef } from 'react';
 
-interface Node { x: number; y: number; vx: number; vy: number; r: number; pulse: number; }
+const NODE_COUNT = 180;
+const MAX_CONN_DIST = 200; // 3D distance to connect
+const FOV = 400;            // perspective strength
+const DEPTH = 600;          // z spread
+const ROTATE_SPEED = 0.06;  // how fast network rotates toward mouse
+const AUTO_ROTATE = 0.0003; // gentle auto-spin
 
-const COLORS = { line: '45,212,191', node: '45,212,191', hot: '16,185,129' };
-const NODE_COUNT = 72;
-const MAX_DIST = 160;
-const MOUSE_ATTRACT = 120;
-const MOUSE_FORCE = 0.018;
+interface Node3D {
+  x: number; y: number; z: number;   // 3D world coords
+  vx: number; vy: number; vz: number; // slow drift
+  baseX: number; baseY: number; baseZ: number;
+}
 
 export default function NeuronCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const mouse = useRef({ x: -9999, y: -9999 });
-  const nodes = useRef<Node[]>([]);
+  const mouse = useRef({ nx: 0, ny: 0 }); // normalized -1..1
+  const rot = useRef({ x: 0, y: 0 });     // current rotation angles
   const raf = useRef(0);
+  const nodes = useRef<Node3D[]>([]);
+  const autoAngle = useRef(0);
 
   useEffect(() => {
     const canvas = canvasRef.current!;
@@ -25,86 +32,112 @@ export default function NeuronCanvas() {
     resize();
     window.addEventListener('resize', resize);
 
-    // Init nodes
-    nodes.current = Array.from({ length: NODE_COUNT }, () => ({
-      x: Math.random() * window.innerWidth,
-      y: Math.random() * window.innerHeight,
-      vx: (Math.random() - 0.5) * 0.5,
-      vy: (Math.random() - 0.5) * 0.5,
-      r: 1.5 + Math.random() * 2,
-      pulse: Math.random() * Math.PI * 2,
-    }));
+    // Spawn nodes in a sphere-ish volume
+    nodes.current = Array.from({ length: NODE_COUNT }, () => {
+      const theta = Math.random() * Math.PI * 2;
+      const phi   = Math.acos(2 * Math.random() - 1);
+      const r     = 80 + Math.random() * 260;
+      const bx = r * Math.sin(phi) * Math.cos(theta);
+      const by = r * Math.sin(phi) * Math.sin(theta);
+      const bz = (Math.random() - 0.5) * DEPTH;
+      return {
+        x: bx, y: by, z: bz,
+        baseX: bx, baseY: by, baseZ: bz,
+        vx: (Math.random() - 0.5) * 0.15,
+        vy: (Math.random() - 0.5) * 0.15,
+        vz: (Math.random() - 0.5) * 0.15,
+      };
+    });
 
-    const onMove = (e: MouseEvent) => { mouse.current = { x: e.clientX, y: e.clientY }; };
-    const onLeave = () => { mouse.current = { x: -9999, y: -9999 }; };
+    const onMove = (e: MouseEvent) => {
+      mouse.current.nx = (e.clientX / window.innerWidth  - 0.5) * 2; // -1..1
+      mouse.current.ny = (e.clientY / window.innerHeight - 0.5) * 2;
+    };
     window.addEventListener('mousemove', onMove);
-    window.addEventListener('mouseleave', onLeave);
 
     const draw = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      const ns = nodes.current;
-      const mx = mouse.current.x, my = mouse.current.y;
+      const W = canvas.width, H = canvas.height;
+      ctx.clearRect(0, 0, W, H);
+      const cx = W / 2, cy = H / 2;
 
-      // Update nodes
-      for (const n of ns) {
-        n.pulse += 0.02;
-        // Mouse attraction
-        const dx = mx - n.x, dy = my - n.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < MOUSE_ATTRACT && dist > 0) {
-          n.vx += (dx / dist) * MOUSE_FORCE;
-          n.vy += (dy / dist) * MOUSE_FORCE;
-        }
-        // Dampen
-        n.vx *= 0.98; n.vy *= 0.98;
-        // Max speed
-        const spd = Math.sqrt(n.vx * n.vx + n.vy * n.vy);
-        if (spd > 1.8) { n.vx = (n.vx / spd) * 1.8; n.vy = (n.vy / spd) * 1.8; }
-        n.x += n.vx; n.y += n.vy;
-        // Bounce
-        if (n.x < 0) { n.x = 0; n.vx = Math.abs(n.vx); }
-        if (n.x > canvas.width) { n.x = canvas.width; n.vx = -Math.abs(n.vx); }
-        if (n.y < 0) { n.y = 0; n.vy = Math.abs(n.vy); }
-        if (n.y > canvas.height) { n.y = canvas.height; n.vy = -Math.abs(n.vy); }
+      // Auto rotate + mouse-driven target rotation
+      autoAngle.current += AUTO_ROTATE;
+      const targetRX = mouse.current.ny * 0.55; // pitch
+      const targetRY = mouse.current.nx * 0.65 + autoAngle.current; // yaw + drift
+      rot.current.x += (targetRX - rot.current.x) * ROTATE_SPEED;
+      rot.current.y += (targetRY - rot.current.y) * ROTATE_SPEED;
+
+      const rx = rot.current.x, ry = rot.current.y;
+      const cosX = Math.cos(rx), sinX = Math.sin(rx);
+      const cosY = Math.cos(ry), sinY = Math.sin(ry);
+
+      // Slow drift for each node
+      for (const n of nodes.current) {
+        n.x += n.vx; n.y += n.vy; n.z += n.vz;
+        // Soft spring back to base
+        n.vx += (n.baseX - n.x) * 0.0005;
+        n.vy += (n.baseY - n.y) * 0.0005;
+        n.vz += (n.baseZ - n.z) * 0.0005;
+        n.vx *= 0.99; n.vy *= 0.99; n.vz *= 0.99;
       }
 
+      // Project 3D → 2D with Y-then-X rotation
+      const projected = nodes.current.map(n => {
+        // Rotate Y (yaw)
+        const x1 =  n.x * cosY + n.z * sinY;
+        const z1 = -n.x * sinY + n.z * cosY;
+        // Rotate X (pitch)
+        const y2 =  n.y * cosX - z1 * sinX;
+        const z2 =  n.y * sinX + z1 * cosX;
+        // Perspective divide
+        const scale = FOV / (FOV + z2 + DEPTH * 0.5);
+        return {
+          sx: cx + x1 * scale,
+          sy: cy + y2 * scale,
+          scale,
+          z2,
+          r: Math.max(1, 3.5 * scale),
+          alpha: Math.min(1, Math.max(0.15, scale * 1.2)),
+        };
+      });
+
+      // Sort back-to-front so near nodes draw on top
+      const order = projected.map((_, i) => i).sort((a, b) => projected[a].z2 - projected[b].z2);
+
       // Draw connections
-      for (let i = 0; i < ns.length; i++) {
-        for (let j = i + 1; j < ns.length; j++) {
-          const dx = ns[i].x - ns[j].x, dy = ns[i].y - ns[j].y;
-          const d = Math.sqrt(dx * dx + dy * dy);
-          if (d < MAX_DIST) {
-            const alpha = (1 - d / MAX_DIST) * 0.4;
-            // Check if either node is near mouse
-            const hotI = Math.hypot(mx - ns[i].x, my - ns[i].y) < MOUSE_ATTRACT;
-            const hotJ = Math.hypot(mx - ns[j].x, my - ns[j].y) < MOUSE_ATTRACT;
-            const color = (hotI || hotJ) ? COLORS.hot : COLORS.line;
-            const lineAlpha = (hotI || hotJ) ? alpha * 2.2 : alpha;
-            ctx.beginPath();
-            ctx.moveTo(ns[i].x, ns[i].y);
-            ctx.lineTo(ns[j].x, ns[j].y);
-            ctx.strokeStyle = `rgba(${color},${Math.min(lineAlpha, 0.7)})`;
-            ctx.lineWidth = (hotI || hotJ) ? 1.2 : 0.7;
-            ctx.stroke();
-          }
+      for (let ii = 0; ii < order.length; ii++) {
+        const i = order[ii];
+        const pi = projected[i];
+        for (let jj = ii + 1; jj < order.length; jj++) {
+          const j = order[jj];
+          const pj = projected[j];
+          // Use screen distance for performance
+          const dx = pi.sx - pj.sx, dy = pi.sy - pj.sy;
+          const screenDist = Math.sqrt(dx * dx + dy * dy);
+          if (screenDist > MAX_CONN_DIST) continue;
+          const a = (1 - screenDist / MAX_CONN_DIST) * Math.min(pi.alpha, pj.alpha) * 0.55;
+          if (a < 0.01) continue;
+          ctx.beginPath();
+          ctx.moveTo(pi.sx, pi.sy);
+          ctx.lineTo(pj.sx, pj.sy);
+          ctx.strokeStyle = `rgba(45,212,191,${a})`;
+          ctx.lineWidth = Math.min(pi.scale, pj.scale) * 1.2;
+          ctx.stroke();
         }
       }
 
       // Draw nodes
-      for (const n of ns) {
-        const nearMouse = Math.hypot(mx - n.x, my - n.y) < MOUSE_ATTRACT;
-        const glow = Math.sin(n.pulse) * 0.3 + 0.7;
-        const r = n.r * (nearMouse ? 1.8 : 1) * glow;
-        const color = nearMouse ? COLORS.hot : COLORS.node;
-        // Outer glow
-        const grad = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, r * 4);
-        grad.addColorStop(0, `rgba(${color},${nearMouse ? 0.5 : 0.2})`);
-        grad.addColorStop(1, `rgba(${color},0)`);
-        ctx.beginPath(); ctx.arc(n.x, n.y, r * 4, 0, Math.PI * 2);
-        ctx.fillStyle = grad; ctx.fill();
-        // Core dot
-        ctx.beginPath(); ctx.arc(n.x, n.y, r, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(${color},${nearMouse ? 0.95 : 0.75})`;
+      for (const i of order) {
+        const p = projected[i];
+        // Glow
+        const g = ctx.createRadialGradient(p.sx, p.sy, 0, p.sx, p.sy, p.r * 5);
+        g.addColorStop(0, `rgba(45,212,191,${p.alpha * 0.35})`);
+        g.addColorStop(1, 'rgba(45,212,191,0)');
+        ctx.beginPath(); ctx.arc(p.sx, p.sy, p.r * 5, 0, Math.PI * 2);
+        ctx.fillStyle = g; ctx.fill();
+        // Core
+        ctx.beginPath(); ctx.arc(p.sx, p.sy, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(45,212,191,${p.alpha * 0.9})`;
         ctx.fill();
       }
 
@@ -116,7 +149,6 @@ export default function NeuronCanvas() {
       cancelAnimationFrame(raf.current);
       window.removeEventListener('resize', resize);
       window.removeEventListener('mousemove', onMove);
-      window.removeEventListener('mouseleave', onLeave);
     };
   }, []);
 
