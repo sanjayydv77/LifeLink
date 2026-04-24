@@ -58,7 +58,7 @@ function RequestRow({ type, name, phone, detail, status, time, onAccept, onRejec
 }) {
   const isPending = status === 'pending';
   return (
-    <div className="bg-[#0a2822] border border-teal-800/30 rounded-xl p-4 flex items-center gap-4 transition-all hover:border-teal-600/40">
+    <div className="bg-[#10352c] border border-teal-800/30 rounded-xl p-4 flex items-center gap-4 transition-all hover:border-teal-600/40">
       <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${
         type === 'emergency' ? 'bg-rose-900/40 text-rose-400' :
         type === 'bed' ? 'bg-emerald-900/40 text-emerald-400' :
@@ -102,7 +102,7 @@ function RequestRow({ type, name, phone, detail, status, time, onAccept, onRejec
 function AmbulanceAlertRow({ notif, onAccept, onReject }: { notif: AmbulanceNotif; onAccept: () => void; onReject: () => void }) {
   const isPending = notif.status === 'pending';
   return (
-    <div className={`border rounded-xl p-4 transition-all ${isPending ? 'bg-gradient-to-r from-rose-950/30 to-[#0a2822] border-rose-800/40 animate-pulse-slow' : 'bg-[#0a2822] border-teal-800/30'}`}>
+    <div className={`border rounded-xl p-4 transition-all ${isPending ? 'bg-gradient-to-r from-rose-950/30 to-[#10352c] border-rose-800/40 animate-pulse-slow' : 'bg-[#10352c] border-teal-800/30'}`}>
       <div className="flex items-start gap-4">
         <div className="w-10 h-10 rounded-full bg-rose-900/40 flex items-center justify-center shrink-0">
           <Car className="w-5 h-5 text-rose-400" />
@@ -584,8 +584,8 @@ export default function HospitalPortal() {
   // Show profile error screen
   if (profileError) {
     return (
-      <div className="flex h-screen bg-[#041512] items-center justify-center">
-        <div className="text-center p-8 bg-[#0b2e28] border border-rose-700/40 rounded-2xl max-w-md">
+      <div className="flex h-screen bg-[#071e17] items-center justify-center">
+        <div className="text-center p-8 bg-[#113c33] border border-rose-700/40 rounded-2xl max-w-md">
           <Building2 className="w-12 h-12 text-rose-400 mx-auto mb-4" />
           <h2 className="text-white font-bold text-xl mb-2">Hospital Profile Not Found</h2>
           <p className="text-teal-400/70 text-sm mb-4">{profileError}</p>
@@ -596,9 +596,9 @@ export default function HospitalPortal() {
   }
 
   return (
-    <div className="flex h-screen bg-[#041512] font-sans overflow-hidden">
+    <div className="flex h-screen bg-[#071e17] font-sans overflow-hidden">
       {/* Left Sidebar */}
-      <div className="w-64 bg-[#071E1A] border-r border-teal-900/40 flex flex-col shrink-0">
+      <div className="w-64 bg-[#0c2a23] border-r border-teal-900/40 flex flex-col shrink-0">
         <div className="p-5 border-b border-teal-900/40">
           <div className="flex items-center gap-3 mb-1">
             <div className="bg-pink-500/20 p-2 rounded-lg"><Building2 className="text-pink-400 w-5 h-5" /></div>
@@ -642,7 +642,7 @@ export default function HospitalPortal() {
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Top Header */}
-        <header className="bg-[#0A2924] border-b border-teal-900/40 px-6 py-4 flex items-center justify-between shrink-0">
+        <header className="bg-[#10362e] border-b border-teal-900/40 px-6 py-4 flex items-center justify-between shrink-0">
           <div>
             <h1 className="text-xl font-bold text-white">{hospitalInfo?.name || 'Hospital Dashboard'}</h1>
             <p className="text-teal-400/60 text-xs mt-0.5">{hospitalInfo?.city ? `${hospitalInfo.city} · ` : ''}Hospital Administration Dashboard</p>
@@ -682,7 +682,7 @@ export default function HospitalPortal() {
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 <StatCard label="Pending Requests" value={pendingEmergencies + pendingAppointments} icon={<ClipboardList className="w-5 h-5" />} color="bg-rose-950/30 border-rose-800/30" />
                 <StatCard label="Ambulance Alerts" value={pendingAmbulance} icon={<Car className="w-5 h-5" />} color="bg-amber-950/30 border-amber-800/30" />
-                <StatCard label="Total Emergencies" value={emergencies.length} icon={<AlertTriangle className="w-5 h-5" />} color="bg-teal-950/30 border-teal-800/30" />
+                <StatCard label="Total Emergencies" value={emergencies.length} icon={<AlertTriangle className="w-5 h-5" />} color="bg-teal-900/30 border-teal-800/30" />
                 <StatCard label="Total Appointments" value={appointments.length} icon={<CalendarCheck className="w-5 h-5" />} color="bg-violet-950/30 border-violet-800/30" />
               </div>
 
@@ -696,7 +696,7 @@ export default function HospitalPortal() {
                     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
                     .slice(0, 5)
                     .map((item: any) => (
-                      <div key={item.id} className="bg-[#0a2822] border border-teal-800/30 rounded-lg p-3 flex items-center gap-3">
+                      <div key={item.id} className="bg-[#10352c] border border-teal-800/30 rounded-lg p-3 flex items-center gap-3">
                         <div className={`w-2 h-2 rounded-full ${item.status === 'pending' ? 'bg-amber-400 animate-pulse' : item.status === 'cancelled' ? 'bg-rose-400' : 'bg-emerald-400'}`}></div>
                         <span className="text-white text-sm font-semibold flex-1 truncate">{item.patientName} — {item.title || item.reason}</span>
                         <span className="text-teal-500/50 text-[10px]">{new Date(item.createdAt).toLocaleString()}</span>
@@ -734,7 +734,7 @@ export default function HospitalPortal() {
 
               <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
                 {[
-                  { key: 'generalBeds', label: 'General Beds', icon: <BedDouble className="w-6 h-6" />, color: 'from-teal-900/60 to-teal-950/40 border-teal-700/40', iconColor: 'text-teal-400' },
+                  { key: 'generalBeds', label: 'General Beds', icon: <BedDouble className="w-6 h-6" />, color: 'from-teal-900/60 to-teal-900/40 border-teal-700/40', iconColor: 'text-teal-400' },
                   { key: 'icuBeds', label: 'ICU Beds', icon: <HeartPulse className="w-6 h-6" />, color: 'from-rose-900/40 to-rose-950/30 border-rose-700/40', iconColor: 'text-rose-400' },
                   { key: 'oxygenCylinders', label: 'Oxygen Cylinders', icon: <Wind className="w-6 h-6" />, color: 'from-sky-900/40 to-sky-950/30 border-sky-700/40', iconColor: 'text-sky-400' },
                   { key: 'ventilators', label: 'Ventilators', icon: <Activity className="w-6 h-6" />, color: 'from-violet-900/40 to-violet-950/30 border-violet-700/40', iconColor: 'text-violet-400' },
@@ -758,7 +758,7 @@ export default function HospitalPortal() {
                           type="number"
                           value={(inventory as any)[item.key]}
                           onChange={e => setInventory(prev => ({ ...prev, [item.key]: Math.max(0, parseInt(e.target.value) || 0) }))}
-                          className="flex-1 bg-[#05110E] border border-teal-800/40 rounded-lg px-3 py-1.5 text-white text-center text-sm font-bold focus:border-teal-500 focus:outline-none"
+                          className="flex-1 bg-[#081a14] border border-teal-800/40 rounded-lg px-3 py-1.5 text-white text-center text-sm font-bold focus:border-teal-500 focus:outline-none"
                         />
                         <button onClick={() => updateInventoryField(item.key, 1)} className="w-8 h-8 rounded-lg bg-emerald-900/40 border border-emerald-800/40 text-emerald-300 flex items-center justify-center hover:bg-emerald-800/50 transition-all">
                           <Plus className="w-4 h-4" />
@@ -783,7 +783,7 @@ export default function HospitalPortal() {
                       type="text"
                       value={inventory.bloodAvailable}
                       onChange={e => setInventory(prev => ({ ...prev, bloodAvailable: e.target.value }))}
-                      className="w-full bg-[#05110E] border border-teal-800/40 rounded-lg px-3 py-1.5 text-white text-sm font-bold focus:border-teal-500 focus:outline-none mt-2"
+                      className="w-full bg-[#081a14] border border-teal-800/40 rounded-lg px-3 py-1.5 text-white text-sm font-bold focus:border-teal-500 focus:outline-none mt-2"
                       placeholder="e.g. A+, B+, O-"
                     />
                   )}
@@ -884,7 +884,7 @@ export default function HospitalPortal() {
                 <div className="space-y-3">
                   <p className="text-xs text-teal-400/70 mb-3">Select a hospital to request resources from them. Only hospitals with available units are shown as requestable.</p>
                   {allHospitals.map(h => (
-                    <div key={h.id} className="bg-[#0a2822] border border-teal-800/30 rounded-xl p-4 hover:border-teal-600/40 transition-all">
+                    <div key={h.id} className="bg-[#10352c] border border-teal-800/30 rounded-xl p-4 hover:border-teal-600/40 transition-all">
                       <div className="flex items-start justify-between mb-3">
                         <div>
                           <h3 className="font-bold text-white text-sm">{h.name}</h3>
@@ -905,7 +905,7 @@ export default function HospitalPortal() {
                           { label: 'Gen. Beds', val: h.totalBeds, color: h.totalBeds > 0 ? 'text-teal-300' : 'text-rose-400' },
                           { label: 'Ventilators', val: h.ventilators, color: h.ventilators > 0 ? 'text-teal-300' : 'text-rose-400' },
                         ].map(stat => (
-                          <div key={stat.label} className="bg-[#071e1a] rounded-lg p-2 border border-teal-900/30 text-center">
+                          <div key={stat.label} className="bg-[#0c2a23] rounded-lg p-2 border border-teal-900/30 text-center">
                             <div className={`font-extrabold text-base ${stat.color}`}>{stat.val ?? 0}</div>
                             <div className="text-[9px] text-teal-500/50 uppercase tracking-wider mt-0.5">{stat.label}</div>
                           </div>
@@ -922,8 +922,8 @@ export default function HospitalPortal() {
                 <div className="space-y-3">
                   {incomingRequests.map(req => (
                     <div key={req.id} className={`border rounded-xl p-4 transition-all ${
-                      req.status === 'pending' ? 'bg-gradient-to-r from-amber-950/20 to-[#0a2822] border-amber-700/40' :
-                      req.status === 'agreed' ? 'bg-[#0a2822] border-emerald-800/30' : 'bg-[#0a2822] border-rose-900/30'
+                      req.status === 'pending' ? 'bg-gradient-to-r from-amber-950/20 to-[#10352c] border-amber-700/40' :
+                      req.status === 'agreed' ? 'bg-[#10352c] border-emerald-800/30' : 'bg-[#10352c] border-rose-900/30'
                     }`}>
                       <div className="flex items-start justify-between">
                         <div className="flex-1 min-w-0">
@@ -958,9 +958,9 @@ export default function HospitalPortal() {
                 <div className="space-y-3">
                   {outgoingRequests.map(req => (
                     <div key={req.id} className={`border rounded-xl p-4 transition-all ${
-                      req.status === 'pending' ? 'bg-[#0a2822] border-teal-800/30' :
-                      req.status === 'agreed' ? 'bg-gradient-to-r from-emerald-950/20 to-[#0a2822] border-emerald-800/40' :
-                      'bg-gradient-to-r from-rose-950/10 to-[#0a2822] border-rose-900/30'
+                      req.status === 'pending' ? 'bg-[#10352c] border-teal-800/30' :
+                      req.status === 'agreed' ? 'bg-gradient-to-r from-emerald-950/20 to-[#10352c] border-emerald-800/40' :
+                      'bg-gradient-to-r from-rose-950/10 to-[#10352c] border-rose-900/30'
                     }`}>
                       <div className="flex items-center gap-2 mb-1">
                         <span className="font-bold text-white text-sm">{req.toHospitalName}</span>
@@ -988,8 +988,8 @@ export default function HospitalPortal() {
 
               {/* Send Request Modal */}
               {requestModal.open && requestModal.hospital && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#071e1a]/90 backdrop-blur-sm p-4">
-                  <div className="bg-[#0c2e28] border border-teal-700/50 rounded-2xl w-full max-w-md shadow-2xl">
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0c2a23]/90 backdrop-blur-sm p-4">
+                  <div className="bg-[#123c33] border border-teal-700/50 rounded-2xl w-full max-w-md shadow-2xl">
                     <div className="p-5 border-b border-teal-800/40 flex items-center justify-between">
                       <h3 className="text-white font-bold">Request Resources</h3>
                       <button onClick={() => setRequestModal({ open: false, hospital: null })} className="text-teal-400 hover:text-white"><X className="w-5 h-5" /></button>
@@ -1002,19 +1002,19 @@ export default function HospitalPortal() {
                       <div>
                         <label className="block text-teal-200 text-xs font-bold uppercase tracking-wider mb-2">Resource Type</label>
                         <select value={requestForm.resourceType} onChange={e => setRequestForm(p => ({ ...p, resourceType: e.target.value }))}
-                          className="w-full bg-[#071e1a] border border-teal-800/50 rounded-lg px-4 py-2.5 text-white focus:border-teal-500 outline-none">
+                          className="w-full bg-[#0c2a23] border border-teal-800/50 rounded-lg px-4 py-2.5 text-white focus:border-teal-500 outline-none">
                           {Object.entries(RESOURCE_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
                         </select>
                       </div>
                       <div>
                         <label className="block text-teal-200 text-xs font-bold uppercase tracking-wider mb-2">Quantity Needed</label>
                         <input type="number" min="1" value={requestForm.quantity} onChange={e => setRequestForm(p => ({ ...p, quantity: e.target.value }))}
-                          className="w-full bg-[#071e1a] border border-teal-800/50 rounded-lg px-4 py-2.5 text-white focus:border-teal-500 outline-none" />
+                          className="w-full bg-[#0c2a23] border border-teal-800/50 rounded-lg px-4 py-2.5 text-white focus:border-teal-500 outline-none" />
                       </div>
                       <div>
                         <label className="block text-teal-200 text-xs font-bold uppercase tracking-wider mb-2">Note / Reason (optional)</label>
                         <textarea value={requestForm.message} onChange={e => setRequestForm(p => ({ ...p, message: e.target.value }))} rows={3} placeholder="e.g. Critical patient needs oxygen immediately"
-                          className="w-full bg-[#071e1a] border border-teal-800/50 rounded-lg px-4 py-2.5 text-white focus:border-teal-500 outline-none resize-none placeholder:text-teal-700" />
+                          className="w-full bg-[#0c2a23] border border-teal-800/50 rounded-lg px-4 py-2.5 text-white focus:border-teal-500 outline-none resize-none placeholder:text-teal-700" />
                       </div>
                       <button onClick={sendResourceRequest} disabled={sharingLoading}
                         className="w-full py-3 bg-teal-500 hover:bg-teal-400 disabled:opacity-50 text-white font-bold rounded-xl transition-all flex items-center justify-center gap-2">
@@ -1027,8 +1027,8 @@ export default function HospitalPortal() {
 
               {/* Respond Modal */}
               {respondModal.open && respondModal.req && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#071e1a]/90 backdrop-blur-sm p-4">
-                  <div className="bg-[#0c2e28] border border-teal-700/50 rounded-2xl w-full max-w-md shadow-2xl">
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0c2a23]/90 backdrop-blur-sm p-4">
+                  <div className="bg-[#123c33] border border-teal-700/50 rounded-2xl w-full max-w-md shadow-2xl">
                     <div className="p-5 border-b border-teal-800/40 flex items-center justify-between">
                       <h3 className="text-white font-bold">Respond to Request</h3>
                       <button onClick={() => setRespondModal({ open: false, req: null })} className="text-teal-400 hover:text-white"><X className="w-5 h-5" /></button>
@@ -1043,7 +1043,7 @@ export default function HospitalPortal() {
                       <div>
                         <label className="block text-teal-200 text-xs font-bold uppercase tracking-wider mb-2">Your Message / Reason</label>
                         <textarea value={respondNote} onChange={e => setRespondNote(e.target.value)} rows={3} placeholder="e.g. We can provide 5 cylinders by tomorrow morning"
-                          className="w-full bg-[#071e1a] border border-teal-800/50 rounded-lg px-4 py-2.5 text-white focus:border-teal-500 outline-none resize-none placeholder:text-teal-700" />
+                          className="w-full bg-[#0c2a23] border border-teal-800/50 rounded-lg px-4 py-2.5 text-white focus:border-teal-500 outline-none resize-none placeholder:text-teal-700" />
                       </div>
                       <div className="grid grid-cols-2 gap-3">
                         <button onClick={() => respondToRequest('agreed')} disabled={sharingLoading}
@@ -1070,9 +1070,9 @@ export default function HospitalPortal() {
           {/* Backdrop */}
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => { setProfilePanelOpen(false); setEditingProfile(false); setCsvView('none'); }} />
           {/* Panel */}
-          <div className="relative w-full max-w-lg bg-[#071e1a] border-l border-teal-800/50 h-full overflow-y-auto shadow-2xl flex flex-col">
+          <div className="relative w-full max-w-lg bg-[#0c2a23] border-l border-teal-800/50 h-full overflow-y-auto shadow-2xl flex flex-col">
             {/* Panel Header */}
-            <div className="sticky top-0 z-10 bg-[#0a2822]/95 backdrop-blur-sm border-b border-teal-800/40 px-6 py-4 flex items-center justify-between">
+            <div className="sticky top-0 z-10 bg-[#10352c]/95 backdrop-blur-sm border-b border-teal-800/40 px-6 py-4 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-full bg-teal-900/60 border border-teal-700/40 flex items-center justify-center">
                   <UserCircle2 className="w-5 h-5 text-teal-400" />
@@ -1106,7 +1106,7 @@ export default function HospitalPortal() {
               {!profileLoading && (<>
 
               {/* CSV Upload Section */}
-              <div className="bg-gradient-to-br from-teal-950/40 to-[#041512] border border-teal-800/40 rounded-xl p-4">
+              <div className="bg-gradient-to-br from-teal-900/40 to-[#071e17] border border-teal-800/40 rounded-xl p-4">
                 <div className="flex items-center gap-2 mb-3">
                   <FileSpreadsheet className="w-4 h-4 text-teal-400" />
                   <h3 className="text-white font-bold text-sm">Bulk Import via CSV</h3>
@@ -1118,7 +1118,7 @@ export default function HospitalPortal() {
                     <CheckCircle className="w-4 h-4" /> Profile updated from CSV!
                   </div>
                 ) : csvView === 'uploading' ? (
-                  <div className="flex items-center gap-2 px-4 py-3 bg-teal-950/40 border border-teal-800/40 rounded-xl text-teal-300 text-sm">
+                  <div className="flex items-center gap-2 px-4 py-3 bg-teal-900/40 border border-teal-800/40 rounded-xl text-teal-300 text-sm">
                     <div className="w-4 h-4 border-2 border-t-teal-400 border-teal-800 rounded-full animate-spin" />
                     Processing CSV...
                   </div>
@@ -1138,7 +1138,7 @@ export default function HospitalPortal() {
                 {/* CSV preview table */}
                 <div className="mt-4 rounded-lg overflow-x-auto border border-teal-900/40">
                   <table className="w-full text-[9px] text-left">
-                    <thead className="bg-teal-950/50">
+                    <thead className="bg-teal-900/50">
                       <tr>{['name','address','city','phone','openingTime','closingTime','totalBeds','icuBeds','oxygen'].map(h => <th key={h} className="px-2 py-1.5 text-teal-500/70 uppercase tracking-wider font-bold whitespace-nowrap">{h}</th>)}</tr>
                     </thead>
                     <tbody>
@@ -1166,7 +1166,7 @@ export default function HospitalPortal() {
                   { label: 'Phone', key: 'phone', icon: <Phone className="w-3.5 h-3.5" />, type: 'text' },
                   { label: 'Email', key: 'email', icon: <Mail className="w-3.5 h-3.5" />, type: 'email' },
                 ] as const).map(({ label, key, icon, type }) => (
-                  <div key={key} className="flex items-center gap-3 bg-[#0a2822] border border-teal-800/30 rounded-xl px-4 py-3">
+                  <div key={key} className="flex items-center gap-3 bg-[#10352c] border border-teal-800/30 rounded-xl px-4 py-3">
                     <span className="text-teal-500/60 shrink-0">{icon}</span>
                     <div className="flex-1 min-w-0">
                       <p className="text-teal-500/50 text-[9px] uppercase tracking-wider">{label}</p>
@@ -1189,7 +1189,7 @@ export default function HospitalPortal() {
                   { label: 'State', key: 'state' },
                   { label: 'Zip Code', key: 'zipCode' },
                 ] as const).map(({ label, key }) => (
-                  <div key={key} className="flex items-center gap-3 bg-[#0a2822] border border-teal-800/30 rounded-xl px-4 py-3">
+                  <div key={key} className="flex items-center gap-3 bg-[#10352c] border border-teal-800/30 rounded-xl px-4 py-3">
                     <div className="flex-1 min-w-0">
                       <p className="text-teal-500/50 text-[9px] uppercase tracking-wider">{label}</p>
                       {editingProfile
@@ -1203,7 +1203,7 @@ export default function HospitalPortal() {
                 {editingProfile && (
                   <div className="grid grid-cols-2 gap-2">
                     {([{ label: 'Latitude', key: 'latitude' }, { label: 'Longitude', key: 'longitude' }] as const).map(({ label, key }) => (
-                      <div key={key} className="bg-[#0a2822] border border-teal-800/30 rounded-xl px-4 py-3">
+                      <div key={key} className="bg-[#10352c] border border-teal-800/30 rounded-xl px-4 py-3">
                         <p className="text-teal-500/50 text-[9px] uppercase tracking-wider">{label}</p>
                         <input value={(profileForm as any)[key]} onChange={e => setProfileForm(p => ({ ...p, [key]: e.target.value }))}
                           className="w-full bg-transparent text-white text-sm outline-none border-b border-teal-700/40 focus:border-teal-400 mt-0.5 py-0.5" />
@@ -1218,7 +1218,7 @@ export default function HospitalPortal() {
                 <h3 className="text-[10px] text-teal-500/60 uppercase tracking-widest font-bold flex items-center gap-2"><Clock className="w-3.5 h-3.5" />Operations</h3>
                 <div className="grid grid-cols-2 gap-2">
                   {([{ label: 'Opening Time', key: 'openingTime' }, { label: 'Closing Time', key: 'closingTime' }] as const).map(({ label, key }) => (
-                    <div key={key} className="bg-[#0a2822] border border-teal-800/30 rounded-xl px-4 py-3">
+                    <div key={key} className="bg-[#10352c] border border-teal-800/30 rounded-xl px-4 py-3">
                       <p className="text-teal-500/50 text-[9px] uppercase tracking-wider">{label}</p>
                       {editingProfile
                         ? <input type="time" value={(profileForm as any)[key]} onChange={e => setProfileForm(p => ({ ...p, [key]: e.target.value }))}
@@ -1228,7 +1228,7 @@ export default function HospitalPortal() {
                     </div>
                   ))}
                 </div>
-                <div className="bg-[#0a2822] border border-teal-800/30 rounded-xl px-4 py-3">
+                <div className="bg-[#10352c] border border-teal-800/30 rounded-xl px-4 py-3">
                   <p className="text-teal-500/50 text-[9px] uppercase tracking-wider">Specializations <span className="text-teal-600/60">(comma separated)</span></p>
                   {editingProfile
                     ? <input value={profileForm.specializations} onChange={e => setProfileForm(p => ({ ...p, specializations: e.target.value }))}
@@ -1249,7 +1249,7 @@ export default function HospitalPortal() {
                     { label: 'Ambulances', key: 'ambulances_available' },
                     { label: 'Ventilators', key: 'ventilators' },
                   ] as const).map(({ label, key }) => (
-                    <div key={key} className="bg-[#0a2822] border border-teal-800/30 rounded-xl px-4 py-3">
+                    <div key={key} className="bg-[#10352c] border border-teal-800/30 rounded-xl px-4 py-3">
                       <p className="text-teal-500/50 text-[9px] uppercase tracking-wider">{label}</p>
                       {editingProfile
                         ? <input type="number" min="0" value={(profileForm as any)[key]} onChange={e => setProfileForm(p => ({ ...p, [key]: e.target.value }))}

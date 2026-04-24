@@ -150,12 +150,12 @@ export default function LifeLinkChatbot() {
         {/* Tooltip bubble */}
         {bubble && !open && (
           <div style={{ position:'absolute',bottom:'calc(100% + 10px)',left:'50%',transform:'translateX(-50%)',
-            background:'linear-gradient(135deg,#0a2822,#0c3028)',border:'1px solid rgba(45,212,191,.5)',
+            background:'linear-gradient(135deg,#10352c,#123e34)',border:'1px solid rgba(45,212,191,.5)',
             borderRadius:14,padding:'7px 14px',whiteSpace:'nowrap',boxShadow:'0 8px 24px rgba(0,0,0,.5)',
             animation:'llBubble 3.2s ease forwards',pointerEvents:'none',color:'#5eead4',fontWeight:700,fontSize:12 }}>
             {bubble}
             <div style={{ position:'absolute',bottom:-6,left:'50%',
-              width:10,height:10,background:'#0c3028',border:'1px solid rgba(45,212,191,.4)',
+              width:10,height:10,background:'#123e34',border:'1px solid rgba(45,212,191,.4)',
               borderTop:'none',borderLeft:'none',transform:'translateX(-50%) rotate(45deg)' }} />
           </div>
         )}
@@ -193,7 +193,7 @@ export default function LifeLinkChatbot() {
           position: 'fixed', left: Math.max(8, chatLeft), top: chatTop, zIndex: 9998,
           width: 360, maxHeight: 540, display: 'flex', flexDirection: 'column', borderRadius: 20,
           overflow: 'hidden', boxShadow: '0 24px 64px rgba(0,0,0,.65), 0 0 0 1px rgba(45,212,191,.25)',
-          background: 'linear-gradient(180deg,#0a2822 0%,#071e1a 100%)',
+          background: 'linear-gradient(180deg,#10352c 0%,#0c2a23 100%)',
         }}>
           {/* Header */}
           <div style={{ display:'flex',alignItems:'center',gap:12,padding:'12px 16px',background:'rgba(10,40,34,.9)',borderBottom:'1px solid rgba(45,212,191,.2)',flexShrink:0 }}>
