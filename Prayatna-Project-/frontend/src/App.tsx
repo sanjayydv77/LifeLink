@@ -4,6 +4,7 @@ import PublicPortal from './pages/PublicPortal';
 import AmbulancePortal from './pages/AmbulancePortal';
 import HospitalPortal from './pages/HospitalPortal';
 import AuthPage from './pages/AuthPage';
+import LifeLinkChatbot from './components/LifeLinkChatbot';
 
 // Reads persisted auth from sessionStorage (per-tab — each tab is independent)
 function getStoredUser() {
@@ -85,6 +86,7 @@ function App() {
   return (
     <Router>
       <AppInner />
+      <LifeLinkChatbot />
     </Router>
   );
 }
