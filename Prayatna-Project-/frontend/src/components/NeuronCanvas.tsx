@@ -1,11 +1,11 @@
 import { useEffect, useRef } from 'react';
 
-const NODE_COUNT = 180;
-const MAX_CONN_DIST = 200; // 3D distance to connect
-const FOV = 400;            // perspective strength
-const DEPTH = 600;          // z spread
-const ROTATE_SPEED = 0.06;  // how fast network rotates toward mouse
-const AUTO_ROTATE = 0.0003; // gentle auto-spin
+const NODE_COUNT = 200;
+const MAX_CONN_DIST = 180;
+const FOV = 380;
+const DEPTH = 700;
+const ROTATE_SPEED = 0.055;
+const AUTO_ROTATE = 0.0003;
 
 interface Node3D {
   x: number; y: number; z: number;   // 3D world coords
@@ -32,20 +32,17 @@ export default function NeuronCanvas() {
     resize();
     window.addEventListener('resize', resize);
 
-    // Spawn nodes in a sphere-ish volume
+    // Spawn nodes spread across full viewport
     nodes.current = Array.from({ length: NODE_COUNT }, () => {
-      const theta = Math.random() * Math.PI * 2;
-      const phi   = Math.acos(2 * Math.random() - 1);
-      const r     = 80 + Math.random() * 260;
-      const bx = r * Math.sin(phi) * Math.cos(theta);
-      const by = r * Math.sin(phi) * Math.sin(theta);
+      const bx = (Math.random() - 0.5) * window.innerWidth  * 1.1;
+      const by = (Math.random() - 0.5) * window.innerHeight * 1.1;
       const bz = (Math.random() - 0.5) * DEPTH;
       return {
         x: bx, y: by, z: bz,
         baseX: bx, baseY: by, baseZ: bz,
-        vx: (Math.random() - 0.5) * 0.15,
-        vy: (Math.random() - 0.5) * 0.15,
-        vz: (Math.random() - 0.5) * 0.15,
+        vx: (Math.random() - 0.5) * 0.18,
+        vy: (Math.random() - 0.5) * 0.18,
+        vz: (Math.random() - 0.5) * 0.18,
       };
     });
 
@@ -155,7 +152,7 @@ export default function NeuronCanvas() {
   return (
     <canvas
       ref={canvasRef}
-      style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 0 }}
+      style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', pointerEvents: 'none', zIndex: 0 }}
     />
   );
 }
