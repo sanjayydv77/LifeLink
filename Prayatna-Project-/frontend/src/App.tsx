@@ -6,6 +6,7 @@ import HospitalPortal from './pages/HospitalPortal';
 import AuthPage from './pages/AuthPage';
 import SuperAdmin from './pages/SuperAdmin';
 import LifeLinkChatbot from './components/LifeLinkChatbot';
+import VideoIntro from './components/VideoIntro';
 
 // Reads persisted auth from sessionStorage (per-tab — each tab is independent)
 function getStoredUser() {
@@ -93,8 +94,12 @@ function ChatbotWrapper() {
 }
 
 function App() {
+  const [introDone, setIntroDone] = useState(
+    () => !!sessionStorage.getItem('ll_intro_done')
+  );
   return (
     <Router>
+      {!introDone && <VideoIntro onDone={() => setIntroDone(true)} />}
       <AppInner />
       <ChatbotWrapper />
     </Router>
